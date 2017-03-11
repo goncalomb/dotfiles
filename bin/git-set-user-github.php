@@ -1,0 +1,52 @@
+<?php
+
+error_reporting(~E_WARNING);
+
+$context = stream_context_create([
+	'http' => [
+		'method' => 'GET',
+		'header' => [
+			'User-Agent: file_get_contents'
+		]
+	]
+]);
+
+echo "Who are you on GitHub? (e.g. 'user' or 'user/repository'):\n";
+$value = trim(fgets(STDIN));
+if (preg_match('/^([^\/]+)(?:\/([^\/]+))?$/', $value, $matches)) {
+	echo "\nFetching data...\n";
+	$name = $email = null;
+	if (empty($matches[2])) {
+		$url = 'https://api.github.com/users/' . urlencode($matches[1]);
+		$data = json_decode(file_get_contents($url, false, $context), true);
+		if ($data) {
+			$name = $data['name'];
+			$email = $data['email'];
+		}
+	} else {
+		$url = 'https://api.github.com/repos/' . urlencode($matches[1]) . '/' . urlencode($matches[2]) . '/commits?author=' . urlencode($matches[1]);
+		$data = json_decode(file_get_contents($url, false, $context), true);
+		if ($data && count($data)) {
+			$name = $data[0]['commit']['author']['name'];
+			$email = $data[0]['commit']['author']['email'];
+		}
+	}
+	if ($name) {
+		echo "Setting user.name to '$name'.\n";
+		passthru('git config --global user.name ' . escapeshellarg($name));
+		if ($email) {
+			echo "Setting user.email to '$email'.\n";
+			passthru('git config --global user.email ' . escapeshellarg($email));
+		} else {
+			echo "Email not found, user.email not set!\n";
+		}
+		echo "\n";
+		passthru('git config --global --list');
+	} else {
+		echo "Error, user.name and user.email not set!\n";
+	}
+} else {
+	echo "Invalid input.\n";
+}
+
+?>

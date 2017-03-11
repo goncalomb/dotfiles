@@ -1,0 +1,9 @@
+[alias]
+	lof = log --format=fuller --decorate
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	amend = commit --amend
+	fix-committer-date = rebase --committer-date-is-author-date HEAD~1
+[color]
+	ui = auto
+[push]
+	default = upstream
