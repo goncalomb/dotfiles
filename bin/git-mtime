@@ -1,0 +1,14 @@
+#!/bin/bash
+
+git rev-parse HEAD > /dev/null
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+git ls-tree -r -t HEAD --name-only | while IFS= read -r f; do
+	t=$(git log -n 1 --format="%ct" -- "$f")
+	if [ -n "$t" ]; then
+		echo "$t" "$f"
+		touch -m -d "@$t" "$f"
+	fi
+done

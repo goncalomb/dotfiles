@@ -1,7 +1,11 @@
+DIR=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+
 function confirm {
 	read -r -p "${1:-Are you sure} (y/n)? " YESNO
 	if [[ "$YESNO" =~ ^[yY] ]]; then true; else false; fi
 }
+
+export PATH="$PATH:$DIR/bin"
 
 # remote scripts from my gists
 alias img2ico="curl -s \"https://gist.githubusercontent.com/goncalomb/6d879df103fda9b63feb/raw/img2ico.php\" | php -- $@"
