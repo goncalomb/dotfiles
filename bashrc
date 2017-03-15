@@ -7,6 +7,17 @@ function confirm {
 
 export PATH="$PATH:$DIR/bin"
 
+# prompt variables
+HIS=""
+if [ ! -z "$HOME_IS_SPOOFED" ]; then
+	HIS="\[\e[01;35m\]H "
+fi
+PS1="\[\e[01;32m\]\u@\h\[\e[01;34m\] \w $HIS\[\e[01;32m\]>:\[\e[00m\] "
+PS1="\[\e]0;\u@\h: \w\a\]$PS1" # window title
+PS2="> "
+PS3=""
+PS4="+ "
+
 # remote scripts from my gists
 alias img2ico="curl -s \"https://gist.githubusercontent.com/goncalomb/6d879df103fda9b63feb/raw/img2ico.php\" | php -- $@"
 alias git-problems="curl -s \"https://gist.githubusercontent.com/goncalomb/13f28e459fe4dd656e8b43f92c826140/raw/git-problems\" | bash"
