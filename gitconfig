@@ -3,6 +3,8 @@
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	amend = commit --amend
 	fix-committer-date = rebase --committer-date-is-author-date HEAD~1
+	who = shortlog -nse
+	whoami = config --get-regexp \"^user\\.\"
 [color]
 	ui = auto
 [push]
