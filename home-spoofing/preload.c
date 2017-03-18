@@ -7,37 +7,32 @@
 #include <pwd.h>
 
 extern char *program_invocation_name;
-extern char *program_invocation_short_name;
 
+typedef struct passwd *(*pwd_getpwent) ();
 typedef struct passwd *(*pwd_getpwnam) (const char *name);
 typedef struct passwd *(*pwd_getpwuid) (__uid_t uid);
 
 void spoof_pw(struct passwd *pw, const char *fn) {
+	if (!pw) return;
 	char *home = getenv("HOME");
 	char *debug = getenv("HOME_SPOOFING_DEBUG");
-	if (home && home[0] != '\0' && pw->pw_uid == geteuid()) {
+	if (home && home[0] != '\0' && pw->pw_uid == getuid()) {
 		if (debug && debug[0] != '\0') {
-			printf("[home-spoofing] Intercepting '%s' call, spoofing home:\n", fn);
-			printf("[home-spoofing] '%s' -> '%s'\n", pw->pw_dir, home);
+			printf("[home-spoofing|%s] Intercepting '%s' call, spoofing home:\n", program_invocation_name, fn);
+			printf("[home-spoofing|%s] '%s' -> '%s'\n", program_invocation_name, pw->pw_dir, home);
 		}
 		pw->pw_dir = home;
 	}
 }
 
-struct passwd *getpwnam(const char *name) {
-	pwd_getpwnam getpwnam_orig = dlsym(RTLD_NEXT, "getpwnam");
-	struct passwd *pw = getpwnam_orig(name);
-	if (pw) {
-		spoof_pw(pw, "getpwnam");
+#define INTERCEPT_PW_FUNC(fn, param_type, param) \
+	struct passwd *fn(param_type param) { \
+		pwd_##fn orig = dlsym(RTLD_NEXT, #fn); \
+		struct passwd *pw = orig(param); \
+		spoof_pw(pw, #fn); \
+		return pw; \
 	}
-	return pw;
-}
 
-struct passwd *getpwuid(__uid_t uid) {
-	pwd_getpwuid getpwuid_orig = dlsym(RTLD_NEXT, "getpwuid");
-	struct passwd *pw = getpwuid_orig(uid);
-	if (pw) {
-		spoof_pw(pw, "getpwuid");
-	}
-	return pw;
-}
+INTERCEPT_PW_FUNC(getpwent,,);
+INTERCEPT_PW_FUNC(getpwnam, const char *, name);
+INTERCEPT_PW_FUNC(getpwuid, __uid_t, uid);
