@@ -12,7 +12,11 @@ HIS=""
 if [ ! -z "$HOME_IS_SPOOFED" ]; then
 	HIS="\[\e[01;35m\]H "
 fi
-PS1="\[\e[01;32m\]\u@\h\[\e[01;34m\] \w $HIS\[\e[01;32m\]>:\[\e[00m\] "
+function _ps1_gitbranch {
+	BRANCH=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+	[[ -n "$BRANCH" ]] && echo -e "\x01\e[01;33m\x02$BRANCH "
+}
+PS1="\[\e[01;32m\]\u@\h\[\e[01;34m\] \w $HIS\$(_ps1_gitbranch)\[\e[01;32m\]>:\[\e[00m\] "
 PS1="\[\e]0;\u@\h: \w\a\]$PS1" # window title
 PS2="> "
 PS3=""
