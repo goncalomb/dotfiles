@@ -32,3 +32,5 @@ alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/maste
 # misc
 alias clock="while true; do echo -n \`date\`; sleep 0.1; echo -ne \"\r\e[K\"; done"
 alias socks="echo \"Starting SOCKS tunnel on port 8100...\"; ssh -D 8100 -CnN -- $1"
+
+source "$DIR/bashrc_ssh"

@@ -1,0 +1,62 @@
+#!/bin/bash
+
+function ssh-start {
+	trap '' SIGINT
+	if [ -z "$SSH_AGENT_PID" ]; then
+		eval `ssh-agent -s | sed '/^echo/d'`
+		echo "SSH agent with pid $SSH_AGENT_PID"
+	else
+		echo "SSH agent with pid $SSH_AGENT_PID (already running)"
+	fi
+	KEY_FINGERPRINT=$(ssh-keygen -lf ~/.ssh/id_rsa.pub | grep -oP "([0-9a-f]{2}:)+[0-9a-f]{2}")
+	if ! ssh-add -l | grep "$KEY_FINGERPRINT" > /dev/null; then
+		ssh-add
+	fi
+	trap SIGINT
+	trap ssh-stop EXIT
+}
+
+function ssh-stop {
+	if [ -n "$SSH_AGENT_PID" ]; then
+		ssh-add -D
+		ssh-add -l
+		eval `\\ssh-agent -k`
+	fi
+	sleep 1
+}
+
+function ssh-pass {
+	if [[ -z "$1" ]]; then
+		echo "Missing password." >&2
+		return 1
+	fi
+
+	export SSH_PASS=$1
+	export SSH_ASKPASS=`mktemp`
+	SSH_ASKPASS_TRIES=`mktemp`
+
+	echo 3 > "$SSH_ASKPASS_TRIES"
+
+	cat << EOF > "$SSH_ASKPASS"
+#!/bin/bash
+echo "\$1" >&2
+TRIES=\$((\$(<"$SSH_ASKPASS_TRIES") - 1)) >&2
+if [[ \$TRIES -lt 0 ]]; then
+	echo "[ssh-pass] Aborting..." >&2
+	exit 1
+fi
+echo \$TRIES > "$SSH_ASKPASS_TRIES"
+echo "[ssh-pass] Sending password..." >&2
+echo "\$SSH_PASS"
+exit 0
+EOF
+	chmod 0700 "$SSH_ASKPASS"
+
+	"${@:2}" 0> /dev/null
+
+	rm "$SSH_ASKPASS_TRIES"
+	rm "$SSH_ASKPASS"
+
+	unset SSH_ASKPASS
+	unset SSH_PASS
+}
