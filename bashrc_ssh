@@ -8,7 +8,7 @@ function ssh-start {
 	else
 		echo "SSH agent with pid $SSH_AGENT_PID (already running)"
 	fi
-	KEY_FINGERPRINT=$(ssh-keygen -lf ~/.ssh/id_rsa.pub | grep -oP "([0-9a-f]{2}:)+[0-9a-f]{2}")
+	KEY_FINGERPRINT=$(ssh-keygen -lf ~/.ssh/id_rsa | grep -oP "^\d+\s+[^\s]+")
 	if ! ssh-add -l | grep "$KEY_FINGERPRINT" > /dev/null; then
 		ssh-add
 	fi
@@ -20,7 +20,7 @@ function ssh-stop {
 	if [ -n "$SSH_AGENT_PID" ]; then
 		ssh-add -D
 		ssh-add -l
-		eval `\\ssh-agent -k`
+		eval `ssh-agent -k`
 	fi
 	sleep 1
 }
