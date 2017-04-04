@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# find the serial number of the physical drive that contains a specific file
+
+DEV_NUMBER_DEC=$(stat -c "%d" -- "${1:-.}")
+[[ -z "$DEV_NUMBER_DEC" ]] && exit 1
+DEV_NUMBER=$((DEV_NUMBER_DEC >> 8 & 0xff)):$((DEV_NUMBER_DEC & 0xff))
+DRIVE_DEV_NAME=$(lsblk -n -o NAME,MAJ:MIN | tac | sed -n '/'$DEV_NUMBER'\s*$/,/^\w/p' - | tail -n 1 | cut -d' ' -f1)
+[[ -z "$DRIVE_DEV_NAME" ]] && exit 2
+DRIVE_SERIAL=$(udisks --show-info "/dev/$DRIVE_DEV_NAME" | sed -n 's/^\s*serial:\s*//p')
+[[ -z "$DRIVE_SERIAL" ]] && exit 3
+echo "$DRIVE_SERIAL"
