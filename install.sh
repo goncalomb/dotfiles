@@ -38,6 +38,13 @@ function create_dotfile_link {
 	fi
 }
 
+DIR_BIN="$DIR/bin"
+
+echo "Downloading composer..."
+curl -# -o "$DIR_BIN/composer" "https://getcomposer.org/composer.phar"
+chmod +x "$DIR_BIN/composer"
+echo
+
 echo "Installing dotfiles..."
 create_dotfile_link "bashrc"
 

@@ -1,2 +1,5 @@
 /home-spoofing/*.so
 /home-spoofing/system-hash.txt
+
+/bin/composer
+vendor/
