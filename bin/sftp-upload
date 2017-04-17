@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+DIR_SFTP_UPLOAD="$DIR/src/sftp-upload"
+
+if [[ ! -d "$DIR_SFTP_UPLOAD/vendor" ]]; then
+	(cd "$DIR_SFTP_UPLOAD"; composer install) || exit
+fi
+
+php "$DIR_SFTP_UPLOAD/sftp-upload.php" "$@"
