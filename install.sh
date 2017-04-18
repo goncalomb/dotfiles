@@ -39,11 +39,33 @@ function create_dotfile_link {
 }
 
 DIR_BIN="$DIR/bin"
+DIR_BIN_TERMUX="$DIR/bin/termux"
 
 echo "Downloading composer..."
 curl -# -o "$DIR_BIN/composer" "https://getcomposer.org/composer.phar"
 chmod +x "$DIR_BIN/composer"
 echo
+
+if [[ "$PREFIX" == *"/com.termux/"* ]]; then
+	echo "Running on a Termux environment!"
+	echo "Patching executable scripts..."
+	mkdir "$DIR_BIN_TERMUX" 2> /dev/null
+	for f in "$DIR_BIN/"*; do
+		if [[ -f "$f" && -x "$f" ]]; then
+			i=$(sed -nE "s/^#\!.*\/[sx]?bin\/(.*)/\1/p" "$f" | head -n 1)
+			if [[ -n "$i" ]]; then
+				b=$(basename "$f")
+				cat << EOF > "$DIR_BIN_TERMUX/$b"
+#!$PREFIX/bin/bash
+DIR=\$(cd -P -- "\$(dirname -- "\${BASH_SOURCE[0]}")" && pwd -P)
+$PREFIX/bin/$i "\$DIR/../$b" "\$@"
+EOF
+				chmod +x "$DIR_BIN_TERMUX/$b"
+			fi
+		fi
+	done
+	echo
+fi
 
 echo "Installing dotfiles..."
 create_dotfile_link "bashrc"

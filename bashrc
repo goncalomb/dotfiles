@@ -5,7 +5,11 @@ function confirm {
 	if [[ "$YESNO" =~ ^[yY] ]]; then true; else false; fi
 }
 
-export PATH="$PATH:$DIR/bin"
+if [[ "$PREFIX" == *"/com.termux/"* ]]; then
+	export PATH="$PATH:$DIR/bin/termux"
+else
+	export PATH="$PATH:$DIR/bin"
+fi
 
 # prompt variables
 HIS=""
