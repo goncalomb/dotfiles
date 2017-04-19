@@ -41,11 +41,6 @@ function create_dotfile_link {
 DIR_BIN="$DIR/bin"
 DIR_BIN_TERMUX="$DIR/bin/termux"
 
-echo "Downloading composer..."
-curl -# -o "$DIR_BIN/composer" "https://getcomposer.org/composer.phar"
-chmod +x "$DIR_BIN/composer"
-echo
-
 if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	echo "Running on a Termux environment!"
 	echo "Patching executable scripts..."
