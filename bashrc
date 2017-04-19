@@ -35,6 +35,9 @@ alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/maste
 
 # misc
 alias 80="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 80 > /dev/null"
+alias 160="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 160 > /dev/null"
+alias small="resize -s 24 80 > /dev/null"
+alias big="resize -s 36 120 > /dev/null"
 alias clock="while true; do echo -n \`date\`; sleep 0.1; echo -ne \"\r\e[K\"; done"
 alias socks="echo \"Starting SOCKS tunnel on port 8100...\"; ssh -D 8100 -CnN -- $1"
 alias clip="xclip -sel clip"
