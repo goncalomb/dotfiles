@@ -27,11 +27,11 @@ PS3=""
 PS4="+ "
 
 # remote scripts from my gists
-alias img2ico="curl -s \"https://gist.githubusercontent.com/goncalomb/6d879df103fda9b63feb/raw/img2ico.php\" | php -- $@"
-alias git-problems="curl -s \"https://gist.githubusercontent.com/goncalomb/13f28e459fe4dd656e8b43f92c826140/raw/git-problems\" | bash"
+alias img2ico="curl -s \"https://gist.githubusercontent.com/goncalomb/6d879df103fda9b63feb/raw/img2ico.php\" | php --"
+alias git-problems="curl -s \"https://gist.githubusercontent.com/goncalomb/13f28e459fe4dd656e8b43f92c826140/raw/git-problems\" | bash -s -"
 
 # remote speed test script
-alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python"
+alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 
 # misc
 alias 80="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 80 > /dev/null"
@@ -39,7 +39,7 @@ alias 160="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 160 > /dev/nu
 alias small="resize -s 24 80 > /dev/null"
 alias big="resize -s 36 120 > /dev/null"
 alias clock="while true; do echo -n \`date\`; sleep 0.1; echo -ne \"\r\e[K\"; done"
-alias socks="echo \"Starting SOCKS tunnel on port 8100...\"; ssh -D 8100 -CnN -- $1"
+alias socks="echo \"Starting SOCKS tunnel on port 8100...\"; ssh -D 8100 -CnN --"
 alias clip="xclip -sel clip"
 alias clip-key="xclip -sel clip < ~/.ssh/id_rsa.pub"
 alias random-64k="dd if=/dev/urandom count=128 bs=512 2> /dev/null"
