@@ -4,7 +4,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 date_default_timezone_set('UTC');
 
-$options = getopt('fs:p:d:u:');
+$options = getopt('fs:p:d:u:e:');
 
 $remote_host = null;
 if (isset($options['s'])) {
@@ -17,7 +17,7 @@ $remote_port = (isset($options['p']) ? (int) $options['p'] : 22);
 $remote_dir = (isset($options['d']) ? $options['d'] : '~');
 $remote_user = (isset($options['u']) ? $options['u'] : get_current_user());
 
-$local_dir = __DIR__;
+$local_dir = getcwd();
 
 echo "Local: {$local_dir}\n";
 echo "Remote: {$remote_user}@{$remote_host}:$remote_dir (on port {$remote_port})\n";
@@ -27,13 +27,15 @@ if (!isset($options['f'])) {
 	echo "DRY RUN: Not uploading (use -f to upload).\n\n";
 }
 
-$excludes = array();
+$excludes = (isset($options['e']) ? explode(',', $options['e']) : array());
+$excludes = array_filter($excludes, function($x) { return !empty($x); });
 
 function is_exclude_file($path) {
 	global $excludes;
 	foreach ($excludes as $v) {
 		if (substr($v, 0, 6) == "regex:") {
-			return preg_match(substr($v, 6), $path);
+			$r = substr($v, 6);
+			return @preg_match(substr($v, 6), $path);
 		} else {
 			return ($path == $v);
 		}
