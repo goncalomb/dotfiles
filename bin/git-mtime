@@ -5,6 +5,10 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
+# TODO: for some reason `git ls-tree -r -t HEAD` only works on the top level
+#       just cd to the top level for now
+cd "`git rev-parse --show-toplevel`"
+
 git ls-tree -r -t HEAD --name-only | while IFS= read -r f; do
 	t=$(git log -n 1 --format="%ct" -- "$f")
 	if [ -n "$t" ]; then
