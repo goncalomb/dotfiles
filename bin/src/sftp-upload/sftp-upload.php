@@ -34,7 +34,6 @@ function is_exclude_file($path) {
 	global $excludes;
 	foreach ($excludes as $v) {
 		if (substr($v, 0, 6) == "regex:") {
-			$r = substr($v, 6);
 			return @preg_match(substr($v, 6), $path);
 		} else {
 			return ($path == $v);
@@ -99,7 +98,7 @@ function upload_file($sftp, $path, $mtime) {
 $no_changes = true;
 
 function process_remote_files($sftp, $dir, $relative='') {
-	global $sftp, $local_files;
+	global $sftp, $local_files, $no_changes, $options, $local_dir, $remote_dir;
 	$path = $dir . ($relative ? '/' . $relative : '');
 	$list = $sftp->nlist($path);
 	if (!$list) {
@@ -116,6 +115,24 @@ function process_remote_files($sftp, $dir, $relative='') {
 		$type = $sftp->filetype($entry_path);
 		if ($type == 'dir') {
 			process_remote_files($sftp, $dir, $entry_path_relative);
+			// TODO: handle directories better
+			$lp = "{$local_dir}/{$entry_path_relative}";
+			if (is_dir($lp)) {
+				$no_changes = false;
+				$r = $sftp->stat($entry_path)['mtime'];
+				$l = filemtime($lp);
+				if ($r != $l) {
+					echo "(DIR) {$entry_path_relative}:\n";
+					echo '  ', date('c', $l), ' != ', date('c', $r), "\n";
+					echo "  Touching...\n";
+					if (isset($options['f'])) {
+						$sftp->touch("{$remote_dir}/{$entry_path_relative}", $l);
+					}
+				}
+			} else {
+				$no_changes = false;
+				echo "{$entry_path_relative}:\n  Extra dir on remote.\n";
+			}
 		} else if ($type == 'file') {
 			if (isset($local_files[$entry_path_relative])) {
 				$stat = $sftp->stat($entry_path);
@@ -123,7 +140,7 @@ function process_remote_files($sftp, $dir, $relative='') {
 				$local_mtime = $local_files[$entry_path_relative]['mtime'];
 				if ($remote_mtime < $local_mtime) {
 					$no_changes = false;
-					echo "{$path}:\n";
+					echo "{$entry_path_relative}:\n";
 					echo '  ', date('c', $local_mtime), ' > ', date('c', $remote_mtime), "\n";
 					echo "  Local copy is newer, uploading...\n";
 					if (isset($options['f'])) {
@@ -131,14 +148,14 @@ function process_remote_files($sftp, $dir, $relative='') {
 					}
 				} else if ($remote_mtime > $local_mtime) {
 					$no_changes = false;
-					echo "{$path}:\n";
+					echo "{$entry_path_relative}:\n";
 					echo '  ', date('c', $local_mtime), ' < ', date('c', $remote_mtime), "\n";
 					echo "  Remote copy is newer.\n";
 				}
 				unset($local_files[$entry_path_relative]);
 			} else {
 				$no_changes = false;
-				echo "{$path}:\n  Extra file on remote.\n";
+				echo "{$entry_path_relative}:\n  Extra file on remote.\n";
 			}
 		} else {
 			echo "Remote: Not a file '$entry_path'!\n";
