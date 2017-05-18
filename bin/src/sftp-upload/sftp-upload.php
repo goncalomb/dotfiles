@@ -4,7 +4,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 date_default_timezone_set('UTC');
 
-$options = getopt('fs:p:d:u:e:');
+$options = getopt('fas:p:d:u:e:');
 
 $remote_host = null;
 if (isset($options['s'])) {
@@ -70,11 +70,15 @@ $rsa->loadKey($sftp->getServerPublicHostKey());
 $fingerprint = $rsa->getPublicKeyFingerprint();
 echo "Server fingerprint: {$fingerprint}\n";
 
-echo "Password for '{$remote_user}':\n";
-$pass = fgets(STDIN);
-echo "\033[1A\033[K";
-
-$sftp->login($remote_user, trim($pass, "\n\r")) || exit();
+if (isset($options['a'])) {
+	$agent = new \phpseclib\System\SSH\Agent();
+	$sftp->login($remote_user, $agent) || exit("LOGIN FAILED\n");
+} else {
+	echo "Password for '{$remote_user}':\n";
+	$pass = fgets(STDIN);
+	echo "\033[1A\033[K";
+	$sftp->login($remote_user, trim($pass, "\n\r")) || exit("LOGIN FAILED\n");
+}
 
 echo "Connected...\n\n";
 
