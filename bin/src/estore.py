@@ -45,7 +45,7 @@ if os.path.lexists(dir_estore):
 	if not os.path.isdir(dir_estore):
 		sys.exit("error: '{}' exists but is not a directory".format(dir_estore))
 else:
-	os.path.mkdir(dir_estore)
+	os.mkdir(dir_estore)
 
 # find the requested file
 the_file = os.path.join(dir_estore, path[0] + ".plain.bin")
