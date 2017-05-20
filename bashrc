@@ -55,4 +55,5 @@ alias myip4="curl -s -4 https://icanhazip.com/"
 alias myhost="curl -s https://icanhazptr.com/"
 alias myhost4="curl -s -4 https://icanhazptr.com/"
 
+source "$DIR/bashrc_pass"
 source "$DIR/bashrc_ssh"
