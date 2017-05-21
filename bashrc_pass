@@ -1,8 +1,8 @@
 #!/bin/bash
 
-function _wait_to_void_clipboard {
+function _pass_wait_to_void_clipboard {
 	trap '' SIGINT
-	read -s -t 20 -p "press enter to continue"; echo
+	read -s -t ${PASS_CLIPBOARD_TIME:-20} -p "press enter to continue"; echo
 	echo -n "void" | xclip -sel clip
 	echo "clipboard cleared"
 	trap SIGINT
@@ -13,12 +13,12 @@ function pass {
 		echo "missing name" >&2
 		return
 	fi
-	pass=$(estore -rs -p "passwords/$1") || return
+	pass=$(${PASS_ESTORE_COMMAND:-estore} -rs -p "passwords/$1") || return
 	echo -n "$pass" | xclip -sel clip
 	echo; echo "--------------------------------------------------------------------------------";
-	echo -e "\e[1;36mpassword '$1' copied to clipboard for 20 seconds\e[0m"
+	echo -e "\e[1;36mpassword '$1' copied to clipboard for ${PASS_CLIPBOARD_TIME:-20} seconds\e[0m"
 	echo "--------------------------------------------------------------------------------"; echo;
-	_wait_to_void_clipboard
+	_pass_wait_to_void_clipboard
 }
 
 function pass-gen {
@@ -27,11 +27,11 @@ function pass-gen {
 		return
 	fi
 	pass=$(pwgen -sy1 32) || return
-	estore -rs -p "passwords/$1" -s "$pass" || return
+	${PASS_ESTORE_COMMAND:-estore} -rs -p "passwords/$1" -s "$pass" || return
 	echo -n "$pass" | xclip -sel clip
 	echo; echo "--------------------------------------------------------------------------------";
 	echo -e "\e[1;32mgenerated and stored a new password\e[0m"
-	echo -e "\e[1;36mpassword '$1' copied to clipboard for 20 seconds\e[0m"
+	echo -e "\e[1;36mpassword '$1' copied to clipboard for ${PASS_CLIPBOARD_TIME:-20} seconds\e[0m"
 	echo "--------------------------------------------------------------------------------"; echo;
-	_wait_to_void_clipboard
+	_pass_wait_to_void_clipboard
 }
