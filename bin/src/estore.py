@@ -1,6 +1,10 @@
 #from __future__ import division, absolute_import, print_function, unicode_literals
 
-import os, sys, io, re, json, argparse, getpass
+import os, sys, io, re, json, argparse, getpass, signal
+import simplecrypt
+
+signal.signal(signal.SIGINT, lambda a, b: sys.exit("abort: SIGINT"))
+signal.signal(signal.SIGTERM, lambda a, b: sys.exit("abort: SIGTERM"))
 
 def is_unicode_str(o):
 	try: return type(o) is unicode
@@ -48,13 +52,23 @@ else:
 	os.mkdir(dir_estore)
 
 # find the requested file
-the_file = os.path.join(dir_estore, path[0] + ".plain.bin")
+the_file = os.path.join(dir_estore, path[0] + ".bin")
+
+key=None
+
+def get_key(new=False):
+	global key
+	if not key:
+		key = getpass.getpass(("NEW " if new else "") + "Encryption Key for '{}': ".format(path[0]))
+		if not key:
+			sys.exit("error: empty key")
+	return key
 
 def read_the_file(required=False):
 	data = None
 	if os.path.lexists(the_file):
 		if os.path.isfile(the_file):
-			with io.open(the_file, "r", encoding="utf-8") as fp:
+			with io.open(the_file, "rb") as fp:
 				data = fp.read()
 		else:
 			sys.exit("error: '{}' exists but is not a file".format(the_file))
@@ -63,15 +77,17 @@ def read_the_file(required=False):
 	if not data:
 		return None
 	# TODO: decrypt
-	# print("Key required to open '{}'...")
-	# k = getpass.getpass('Encryption Key: ')
+	try:
+		data = simplecrypt.decrypt(get_key(), data)
+	except simplecrypt.DecryptionException as e:
+		sys.exit("error: decryption error (simple-crypt: {})".format(str(e).lower().rstrip('.')))
 	return json.loads(data)
 
 def write_the_file(obj):
 	data = json.dumps(obj, separators=(',', ':'))
-	# TODO: encrypt
-	with io.open(the_file, "w", encoding="utf8") as fp:
-		fp.write(to_unicode_str(data))
+	data = simplecrypt.encrypt(get_key(True), data)
+	with io.open(the_file, "wb") as fp:
+		fp.write(data)
 
 def remove_the_file():
 	if os.path.lexists(the_file) and os.path.isfile(the_file):
