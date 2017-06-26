@@ -1,8 +1,16 @@
 [alias]
+	d = diff
+	s = status
+	c = commit
+	ca = commit -a
+	a = commit --amend
+	aa = commit -a --amend
+	ane = commit --amend --no-edit
+	aane = commit -a --amend --no-edit
+
 	lof = log --format=fuller --decorate
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit --all
-	amend = commit --amend
-	fix-committer-date = rebase --committer-date-is-author-date HEAD~1
+
 	who = shortlog -nse
 	whoami = config --get-regexp \"^user\\.\"
 [color]
