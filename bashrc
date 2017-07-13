@@ -54,6 +54,24 @@ alias myip="curl -s https://icanhazip.com/"
 alias myip4="curl -s -4 https://icanhazip.com/"
 alias myhost="curl -s https://icanhazptr.com/"
 alias myhost4="curl -s -4 https://icanhazptr.com/"
+# https://askubuntu.com/a/184732
+alias z="gnome-screensaver-command -l"
+# https://askubuntu.com/a/131022
+alias zz="dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Suspend"
+alias zzz="dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate"
+
+function home-cleanup {
+	confirm "This will remove some files from your home directory. Are you sure" || return
+	confirm "DANGER! Delete the files" || return
+	rm "$HOME/.bash_history"
+	rm "$HOME/.python_history"
+	rm "$HOME/.sqlite_history"
+	rm "$HOME/.lesshst"
+	rm "$HOME/.node_repl_history"
+	rm -r "$HOME/.m2"
+	rm -r "$HOME/.pip"
+	rm -r "$HOME/.npm"
+}
 
 source "$DIR/bashrc_pass"
 source "$DIR/bashrc_ssh"
