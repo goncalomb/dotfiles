@@ -34,6 +34,7 @@ alias git-problems="curl -s \"https://gist.githubusercontent.com/goncalomb/13f28
 alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 
 # misc
+alias bashrc=". $HOME/.bashrc"
 alias 80="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 80 > /dev/null"
 alias 160="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 160 > /dev/null"
 alias small="resize -s 24 80 > /dev/null"
@@ -59,6 +60,12 @@ alias z="gnome-screensaver-command -l"
 # https://askubuntu.com/a/131022
 alias zz="dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Suspend"
 alias zzz="dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate"
+# https://stuff.goncalomb.com/euromillions.php
+alias em="echo \"EuroMillions Results...\"; curl -s \"https://stuff.goncalomb.com/euromillions.php\" | grep -v ^# | head -n3"
+
+function port-scan-full {
+	nc -zv "$1" 1-65535 2>&1 | grep --color=never succeeded
+}
 
 function home-cleanup {
 	confirm "This will remove some files from your home directory. Are you sure" || return
