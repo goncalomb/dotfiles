@@ -68,6 +68,7 @@ create_dotfile_link "bashrc"
 if confirm_remove "$DIR_HOME/.gitconfig"; then
 	echo
 	truncate --size 0 "$DIR_HOME/.gitconfig"
-	git config --global include.path "$DIR_RELATIVE/gitconfig"
+	git config --global include.path "~/$DIR_RELATIVE/gitconfig"
+	git config --global core.excludesfile "~/$DIR_RELATIVE/gitignore"
 	php "$DIR/bin/git-set-user-github.php"
 fi

@@ -8,11 +8,13 @@
 	ane = commit --amend --no-edit
 	aane = commit -a --amend --no-edit
 
-	lof = log --format=fuller --decorate
+	lof = log --format=fuller --decorate --stat
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit --all
 
 	who = shortlog -nse
 	whoami = config --get-regexp \"^user\\.\"
+
+	first = "!f() { git rev-list --max-parents=0 HEAD | xargs git log --format=\"%H %ad\"; }; f"
 [color]
 	ui = auto
 [push]
