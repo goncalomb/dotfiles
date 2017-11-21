@@ -1,0 +1,96 @@
+#!/bin/bash
+
+set -e
+
+if [ -z "$1" ]; then
+    echo "android-bak <host> [port (default 22)] [backup location (default \$HOME)]"
+    exit
+fi
+
+HOST="$1"
+PORT="${2:-22}"
+LOCAL_DIR="${3:-$HOME}/android-bak"
+DAY=$(date +%Y%m%d)
+DAY_DIR="$LOCAL_DIR/$DAY"
+
+echo "Backup directory: $DAY_DIR"
+
+ssh -T -p "$PORT" "$HOST" << 'EOF'
+set -e
+
+if ! hash filekeep 2>/dev/null; then
+    echo "Installing filekeep..."
+    if [ -d "filekeep" ]; then
+        git -C "filekeep" fetch -v
+    else
+        git clone "https://github.com/goncalomb/filekeep.git"
+    fi
+    pip3 install --upgrade "filekeep/"
+fi
+
+run_filekeep() {
+    if [ ! -f "filekeep.xml" ]; then
+        echo "Running filekeep..."
+        filekeep create
+        echo "Fixing mtime..."
+        python << 'EOFF'
+import re, subprocess
+from filekeep.collection import *
+c = 0
+def fix_mtime(entry, path):
+    global c
+    if path != ".":
+        mtime_str = subprocess.check_output(["stat", "-c", "%Y %y", path]).decode("utf-8")
+        mtime_re = re.match("^(\d+) \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.(\d{9}) \+\d{4}$", mtime_str)
+        mtime_new = int(mtime_re.group(1) + mtime_re.group(2))
+        if (entry.mtime != mtime_new):
+            c += 1
+            if abs(entry.mtime - mtime_new) < 1e9:
+                entry.mtime = mtime_new
+            else:
+                raise RuntimeError()
+        print(str(entry.mtime) + " " + path)
+    if isinstance(entry, Directory):
+        for e in entry.entries.values():
+            fix_mtime(e, path + "/" + e.name)
+col = Collection(".")
+fix_mtime(col.directory, ".")
+col.write_data()
+print(str(c) + " mtime fixes")
+EOFF
+    fi
+}
+
+echo
+
+if [ -d "/sdcard/DCIM" ]; then
+    echo "Processing '/sdcard/DCIM'..."
+    cd "/sdcard/DCIM"
+    rm -rf ".thumbnails" "100ANDRO"
+    run_filekeep
+fi
+
+if [ -d "/sdcard/Recording" ]; then
+    echo "Processing '/sdcard/Recording'..."
+    cd "/sdcard/Recording"
+    run_filekeep
+fi
+
+EOF
+
+download_dir() {
+    echo
+    if echo "if [ -d \"$1\" ]; then true; else false; fi" | ssh -T -p "$PORT" "$HOST"; then
+        echo "Downloading '$1'..."
+        mkdir -p "$2"
+        rsync --info=progress2 --info=name0 -av -e "ssh -p $PORT" "$HOST:$1/" "$2" && echo -en "\e[5A\e[0J"
+        echo "Checking '$2'..."
+        cd "$2"
+        filekeep verify && echo -e "\e[1;37;42mFILES OK\e[0m" || echo -e "\e[1;37;41mSOMETHING IS NOT RIGHT, CHECK THE LOG!\e[0m"
+    else
+        echo "'$1' not found on remote."
+    fi
+}
+
+download_dir "/sdcard/DCIM" "$DAY_DIR/DCIM_$DAY"
+download_dir "/sdcard/Recording" "$DAY_DIR/Recording_$DAY"
