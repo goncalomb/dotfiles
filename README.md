@@ -52,3 +52,7 @@ Scripts | Description
 [git-mtime](bin/git-mtime) | Set the modified date of the files on a git repository to the last commit date that changed the files.
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
 [socks-for-chrome](bin/socks-for-chrome) | Create a SOCKS proxy with a remote server and start a incognito Google Chrome instance on that proxy.
+
+## License
+
+dotfiles is released under the terms of the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
