@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+
+from __future__ import division, absolute_import, print_function, unicode_literals
+
+import sys, termios, tty
+from curses import ascii
+from datetime import datetime, timezone, timedelta
+import time
+import os, io
+
+prompt_str = ""
+
+def clear():
+    print("\x1b[H\x1b[2J", end="")
+
+def alternate_buffer(on=True):
+    if on:
+        print("\x1b[?1049h", end="")
+    else:
+        print("\x1b[?1049l", end="")
+
+def print_prompt():
+    global prompt_str
+    print("> " + prompt_str, end="")
+    sys.stdout.flush()
+    c = sys.stdin.read(1)
+    if c == "\x7f": # backspace
+        prompt_str = prompt_str[:-1]
+        return -2
+    elif c == "\x0a": # enter
+        return -1
+    elif ascii.isalpha(c) or c == "-":
+        prompt_str += c
+    elif ascii.isdigit(c):
+        return ord(c) - 48
+    return None
+
+def confirm_prompt():
+    while True:
+        c = sys.stdin.read(1)
+        if c == "\x7f": # backspace
+            return False
+        elif c == "\x0a": # enter
+            return True
+
+def save_string(name):
+    # dt = datetime.now(timezone(timedelta(seconds=-time.timezone)))
+    dt = datetime.fromtimestamp(int(time.time()), timezone(timedelta(seconds=-time.timezone)))
+    file_path = os.path.join(os.path.expanduser("~"), "logged-data.txt")
+    # file_path = os.path.join(os.path.expanduser("~"), "logged-data-" + str(dt.month) + str(dt.year) + ".txt")
+    entry = dt.isoformat() + " " + name
+    clear()
+    print("Data Logger")
+    print()
+    print(entry)
+    print()
+    print("[Backspace] to cancel, [Enter] to save")
+    with io.open(file_path, "a+", encoding="utf-8") as fp:
+        fp.write(entry + "\n")
+    if confirm_prompt():
+        print("Saved")
+        time.sleep(1)
+        return True
+    return False
+
+def main():
+    while True:
+        clear()
+        print("Data Logger")
+        print()
+        n = print_prompt()
+        if n is not None:
+            if n == -2 and not prompt_str:
+                break
+            if n == -1 and prompt_str:
+                if save_string(prompt_str):
+                    break
+
+if __name__ == "__main__":
+    alternate_buffer()
+    attr = termios.tcgetattr(sys.stdin.fileno())
+    exit_message = None
+    try:
+        tty.setcbreak(sys.stdin.fileno())
+        main()
+    except KeyboardInterrupt:
+        exit_message = "KeyboardInterrupt"
+    finally:
+        termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, attr)
+        alternate_buffer(False)
+        if exit_message:
+            print(exit_message)
