@@ -75,5 +75,5 @@ if confirm_remove "$DIR_HOME/.gitconfig"; then
 	truncate --size 0 "$DIR_HOME/.gitconfig"
 	git config --global include.path "~/$DIR_RELATIVE/gitconfig"
 	git config --global core.excludesfile "~/$DIR_RELATIVE/gitignore"
-	php "$DIR/bin/git-set-user-github.php"
+	gh-set-user
 fi
