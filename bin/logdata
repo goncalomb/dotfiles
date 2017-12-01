@@ -8,8 +8,57 @@ from curses import ascii
 from datetime import datetime, timezone, timedelta
 import time
 import os, io
+import collections, re
 
+data_dir = os.path.join(os.path.expanduser("~"), "logdata")
+suggestions = None
 prompt_str = ""
+
+def get_datetime(ns=True):
+    if ns:
+        return datetime.now(timezone(timedelta(seconds=-time.timezone)))
+    else:
+        return datetime.fromtimestamp(int(time.time()), timezone(timedelta(seconds=-time.timezone)))
+
+def get_data_file(dt, mkdir=False):
+    path = os.path.join(data_dir, "logdata-" + str(dt.year) + str(dt.month).zfill(2) + ".txt")
+    if mkdir:
+        try: os.mkdir(os.path.dirname(path))
+        except FileExistsError: pass
+    return path
+
+def get_event_stats():
+    last_events = []
+    events_by_frequency = {}
+    re_event = re.compile("^([^ ]+) EVENT ([\w-]+)$")
+    dt = get_datetime()
+    for df in [
+        get_data_file(datetime(dt.year, dt.month, 1) - timedelta(1)),
+        get_data_file(dt)
+    ]:
+        if os.path.isfile(df):
+            with io.open(df) as fp:
+                for line in fp:
+                    line = line.strip()
+                    matches = re_event.match(line)
+                    if matches:
+                        ev_name = matches.group(2)
+                        last_events.append(line)
+                        if len(last_events) > 5:
+                            last_events.pop(0)
+                        if ev_name not in events_by_frequency:
+                            events_by_frequency[ev_name] = 1
+                        else:
+                            events_by_frequency[ev_name] += 1
+    events_by_frequency = collections.OrderedDict(sorted(events_by_frequency.items(), key=lambda x: x[1], reverse=True))
+    def get_sugestions(suffix):
+        nonlocal events_by_frequency
+        suggestions = []
+        for ev_name in events_by_frequency.keys():
+            if ev_name.startswith(suffix):
+                suggestions.append(ev_name)
+        return suggestions
+    return last_events, get_sugestions
 
 def clear():
     print("\x1b[H\x1b[2J", end="")
@@ -26,8 +75,10 @@ def print_prompt(token=False):
     sys.stdout.flush()
     c = sys.stdin.read(1)
     if c == "\x7f": # backspace
-        prompt_str = prompt_str[:-1]
-        return -2
+        if prompt_str:
+            prompt_str = prompt_str[:-1]
+        else:
+            return -2
     elif c == "\x0a": # enter
         return -1
     elif not token or ascii.isalpha(c) or c == "-":
@@ -45,15 +96,8 @@ def confirm_prompt():
             return True
 
 def save_data(data, data_type="TEXT", ns=True):
-    if ns:
-        dt = datetime.now(timezone(timedelta(seconds=-time.timezone)))
-    else:
-        dt = datetime.fromtimestamp(int(time.time()), timezone(timedelta(seconds=-time.timezone)))
-
-    file_path = os.path.join(os.path.expanduser("~"), "logdata", "logdata-" + str(dt.month).zfill(2) + str(dt.year) + ".txt")
-    try: os.mkdir(os.path.dirname(file_path))
-    except FileExistsError: pass
-
+    dt = get_datetime(ns)
+    data_file = get_data_file(dt, True)
     entry = dt.isoformat() + " " + data_type + " " + data
 
     clear()
@@ -64,7 +108,7 @@ def save_data(data, data_type="TEXT", ns=True):
     print("[Backspace] to cancel, [Enter] to save")
 
     if confirm_prompt():
-        with io.open(file_path, "a+", encoding="utf-8") as fp:
+        with io.open(data_file, "a+", encoding="utf-8") as fp:
             fp.write(entry + "\n")
         print("Saved")
         time.sleep(1)
@@ -73,22 +117,45 @@ def save_data(data, data_type="TEXT", ns=True):
 
 def main(args):
     data_type = "EVENT" if args.event else "TEXT"
+
+    if args.event:
+        last_events, get_sugestions = get_event_stats()
+
     while True:
         clear()
         print("Data Logger (" + data_type + ")")
         print()
+
+        if args.event:
+            if last_events:
+                for s in last_events:
+                    print(s)
+                print()
+            suges = get_sugestions(prompt_str)
+            if suges:
+                i = 1
+                for ev_name in suges:
+                    print(str(i) + ". " + ev_name)
+                    if i == 0:
+                        break
+                    i = (i + 1)%10
+                print()
+
         n = print_prompt(args.event)
         if n is not None:
-            if n == -2 and not prompt_str:
+            if n == -2:
                 break
             if n == -1 and prompt_str:
-                if save_data(prompt_str, data_type, not args.use_seconds):
+                if save_data(prompt_str, data_type, args.ns):
+                    break
+            elif args.event and (n > 0 and n <= len(suges) or n == 0 and len(suges) >= 10):
+                if save_data(suges[9 if n == 0 else n - 1], data_type, args.ns):
                     break
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="logdata")
     parser.add_argument('--event', action="store_true")
-    parser.add_argument('--use-seconds', action="store_true")
+    parser.add_argument('--ns', action="store_true")
     args = parser.parse_args()
 
     alternate_buffer()
