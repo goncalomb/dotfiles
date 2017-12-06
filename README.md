@@ -26,7 +26,7 @@ A small collection of git aliases [gitconfig](gitconfig).
 
 With home spoofing you can carry you home directory with you!
 
-Clone this repository to a external drive, then run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh bash` this will open a new bash instance with the $HOME path set to the external drive (see [spoof.sh](home-spoofing/spoof.sh)). It also compiles a and preloads a shared library (see [preload.c](home-spoofing/preload.c)) using LD_PRELOAD, that intercepts some standard C functions to better spoof the HOME directory.
+Clone this repository to a external drive, then run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh bash` this will open a new bash instance with the $HOME path set to the external drive (see [spoof.sh](home-spoofing/spoof.sh)). It also compiles and preloads a shared library (see [preload.c](home-spoofing/preload.c)) using LD_PRELOAD, that intercepts some standard C functions to better spoof the HOME directory.
 
 All programs started from that shell will see the spoofed HOME directory and use it to store their config files, making your HOME directory portable.
 
@@ -49,9 +49,12 @@ Scripts | Description
 [composer](bin/composer) | Run PHP composer (with auto-install).
 [drive-serial](bin/drive-serial) | Find the serial number of the physical drive.
 [estore](bin/estore) ([src](bin/src/estore.py)) | Encrypted data storage (to store passwords and other data).
+[gh-clone](bin/gh-clone) | Clone from GitHub with `gh-clone user/repo`.
+[gh-set-user](bin/gh-set-user) | Sets your git name and email based on your GitHub profile.
 [git-mtime](bin/git-mtime) | Set the modified date of the files on a git repository to the last commit date that changed the files.
+[logdata](bin/logdata) | A script to log events and notes throughout the day.
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
-[socks-for-chrome](bin/socks-for-chrome) | Create a SOCKS proxy with a remote server and start a incognito Google Chrome instance on that proxy.
+[socks-for-chrome](bin/socks-for-chrome) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
 
 ## License
 
