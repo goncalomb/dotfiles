@@ -7,6 +7,10 @@ DEV_NUMBER_DEC=$(stat -c "%d" -- "${1:-.}")
 DEV_NUMBER=$((DEV_NUMBER_DEC >> 8 & 0xff)):$((DEV_NUMBER_DEC & 0xff))
 DRIVE_DEV_NAME=$(lsblk -n -o NAME,MAJ:MIN | tac | sed -n '/'$DEV_NUMBER'\s*$/,/^\w/p' - | tail -n 1 | cut -d' ' -f1)
 [[ -z "$DRIVE_DEV_NAME" ]] && exit 2
-DRIVE_SERIAL=$(udisks --show-info "/dev/$DRIVE_DEV_NAME" | sed -n 's/^\s*serial:\s*//p')
+if command -v foo >/dev/null 2>&1; then
+    DRIVE_SERIAL=$(udisks --show-info "/dev/$DRIVE_DEV_NAME" | sed -n 's/^\s*serial:\s*//p')
+else
+    DRIVE_SERIAL=$(udevadm info "/dev/$DRIVE_DEV_NAME" | sed -n 's/^\s*E: ID_SERIAL_SHORT=\s*//p')
+fi
 [[ -z "$DRIVE_SERIAL" ]] && exit 3
 echo "$DRIVE_SERIAL"
