@@ -82,3 +82,6 @@ function home-cleanup {
 
 source "$DIR/bashrc_pass"
 source "$DIR/bashrc_ssh"
+if [[ "$PREFIX" == *"/com.termux/"* ]]; then
+	source "$DIR/bashrc_termux"
+fi

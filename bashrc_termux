@@ -1,0 +1,10 @@
+#!/bin/bash
+
+googlecamera-cache-save() {
+    set -e
+    CACHE_PATH="/sdcard/Android/data/com.google.android.GoogleCamera"
+    SAVE_PATH="/sdcard/DCIM/googlecamera-cache"
+    mkdir "$SAVE_PATH" 2>/dev/null || true
+    tar -C "$CACHE_PATH" -vzcf "$SAVE_PATH/googlecamera-cache-$(date +%s).tar.gz" cache
+    rm -rf "$CACHE_PATH/cache/"
+}
