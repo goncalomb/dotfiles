@@ -63,7 +63,7 @@ EOF
 	mkdir "$DIR_HOME/.shortcuts" 2> /dev/null
 	echo "$DIR/bin/termux/logdata && killall com.termux"  >"$DIR_HOME/.shortcuts/LogText"
 	echo "$DIR/bin/termux/logdata --event && killall com.termux" > "$DIR_HOME/.shortcuts/LogEvent"
-	echo "(killall sshd && echo \"sshd stopped\") || (sshd && echo \"sshd started\")" > "$DIR_HOME/.shortcuts/StartStopSSHD"
+	echo "BASH_ENV=~/.bashrc bash -c sshd-start-stop" > "$DIR_HOME/.shortcuts/StartStopSSHD"
 	echo
 fi
 

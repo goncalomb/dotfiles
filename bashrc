@@ -1,5 +1,7 @@
 DIR=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
 
+shopt -s expand_aliases
+
 function confirm {
 	read -r -p "${1:-Are you sure} (y/n)? " YESNO
 	if [[ "$YESNO" =~ ^[yY] ]]; then true; else false; fi

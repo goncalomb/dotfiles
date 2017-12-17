@@ -8,3 +8,17 @@ googlecamera-cache-save() {
     tar -C "$CACHE_PATH" -vzcf "$SAVE_PATH/googlecamera-cache-$(date +%s).tar.gz" cache
     rm -rf "$CACHE_PATH/cache/"
 }
+
+sshd-start-stop() {
+    if killall sshd 2> /dev/null; then
+        echo; echo; echo
+        echo -e "\e[1;37;41msshd stopped\e[0m"
+        echo; echo; echo
+    else
+        sshd
+        echo; echo; echo
+        echo -e "\e[1;37;42msshd started\e[0m"
+        mylocalip
+        echo; echo; echo
+    fi
+}
