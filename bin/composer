@@ -9,4 +9,4 @@ if [[ ! -f "$COMPOSER_PHAR" ]]; then
 	chmod +x "$COMPOSER_PHAR"
 fi
 
-php "$COMPOSER_PHAR" -- "$@"
+php "$COMPOSER_PHAR" "$@"

@@ -110,8 +110,6 @@ def save_data(data, data_type="TEXT", ns=True):
     if confirm_prompt():
         with io.open(data_file, "a+", encoding="utf-8") as fp:
             fp.write(entry + "\n")
-        print("Saved")
-        time.sleep(1)
         return True
     return False
 
