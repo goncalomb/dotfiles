@@ -1,0 +1,132 @@
+#!/bin/bash
+
+set -e
+
+USER_HOME=`eval echo ~$USER`
+USER_DESKTOP=$(xdg-user-dir DESKTOP)
+APPLICATIONS_DIR="$USER_HOME/applications"
+DOWNLOAD_DIR="$APPLICATIONS_DIR/downloads"
+
+OPT=""
+OPT_APP=""
+
+create-desktop-link() {
+    TERMINAL=false
+    if [ "$3" == "true" ]; then
+        TERMINAL=true
+    fi
+    cat <<-EOF > "$USER_DESKTOP/$1.desktop"
+[Desktop Entry]
+Terminal=$TERMINAL
+Name=$1
+Exec=$2
+Type=Application
+Icon=gnome-panel-launcher
+EOF
+    chmod +x "$USER_DESKTOP/$1.desktop"
+}
+
+install-jd-gui() {
+    echo "Downloading JD-GUI..."
+    if [[ `wget -qO - jd.benow.ca` =~ https://github.com/java-decompiler/jd-gui/releases/download/[^/]+/(jd-gui-([^\"]+)\.jar) ]]; then
+        URL=${BASH_REMATCH[0]}
+        FILE_NAME=${BASH_REMATCH[1]}
+        LOCAL_FILE="$DOWNLOAD_DIR/$FILE_NAME"
+        curl -f# -Lo "$LOCAL_FILE" "$URL"
+        echo "Installing JD-GUI..."
+        cp "$LOCAL_FILE" "$APPLICATIONS_DIR/jd-gui.jar"
+        create-desktop-link "JD-GUI" "java -jar \"$APPLICATIONS_DIR/jd-gui.jar\""
+    else
+        echo "Could not find url for JD-GUI!"
+    fi
+}
+
+install-minecraft() {
+    echo "Downloading Minecraft..."
+    FILE_NAME="Minecraft.jar"
+    URL="https://s3.amazonaws.com/Minecraft.Download/launcher/$FILE_NAME"
+    LOCAL_FILE="$DOWNLOAD_DIR/$FILE_NAME"
+    curl -f# -Lo "$LOCAL_FILE" "$URL"
+    echo "Installing Minecraft..."
+    cp "$LOCAL_FILE" "$APPLICATIONS_DIR/$FILE_NAME"
+    create-desktop-link "Minecraft" "java -jar \"$INSTALL_DIR/$FILE_NAME\""
+}
+
+install-minecraft-server() {
+    echo "Downloading Minecraft Server..."
+    VERSION=`php -r "echo @json_decode(file_get_contents('https://s3.amazonaws.com/Minecraft.Download/versions/versions.json'), true)['latest']['release'];"`
+    if [ "$VERSION" != "" ]; then
+        FILE_NAME="minecraft_server.$VERSION.jar"
+        URL="https://s3.amazonaws.com/Minecraft.Download/versions/$VERSION/$FILE_NAME"
+        LOCAL_FILE="$DOWNLOAD_DIR/$FILE_NAME"
+        curl -f# -Lo "$LOCAL_FILE" "$URL"
+        echo "Installing Minecraft Server..."
+        INSTALL_DIR="$APPLICATIONS_DIR/MinecraftServer"
+        mkdir "$INSTALL_DIR" 2>/dev/null || true
+        cp "$LOCAL_FILE" "$INSTALL_DIR/$FILE_NAME"
+        cat <<"EOF" > "$INSTALL_DIR/start-server.php"
+<?php
+
+chdir(__DIR__);
+
+$files = glob('*.jar');
+if (count($files) > 1) {
+    $i = 0;
+    foreach ($files as $file) {
+        echo ++$i, ': ', $file, "\n";
+    }
+    do {
+        echo 'Pick a jar file: ';
+        $j = (int) fgets(STDIN);
+    } while ($j <= 0 || $j > $i);
+    $jar = escapeshellarg($files[$j - 1]);
+} else {
+    $jar = escapeshellarg($files[0]);
+}
+
+system("clear");
+system("java -Xmx1024M -Xms1024M -jar {$jar} nogui");
+sleep(3);
+
+?>
+EOF
+        create-desktop-link "MinecraftServer" "php \"$INSTALL_DIR/start-server.php\"" true
+    else
+        echo "Could not find Minecraft Server version!"
+    fi
+}
+
+install-teamspeak() {
+    echo "Downloading TeamSpeak..."
+    if [[ `wget -qO - teamspeak.de/download/` =~ download_os_client.+Client.+Linux.+Version\:\ ([0-9\.]+).+Server ]]; then
+        VERSION=${BASH_REMATCH[1]}
+        FILE_NAME="TeamSpeak3-Client-linux_amd64-$VERSION.run"
+        URL="http://dl.4players.de/ts/releases/$VERSION/$FILE_NAME"
+        LOCAL_FILE="$DOWNLOAD_DIR/$FILE_NAME"
+        curl -f# -Lo "$LOCAL_FILE" "$URL"
+        echo "Installing TeamSpeak..."
+        yes | bash "$LOCAL_FILE" --nox11 | cat > /dev/null; echo
+        create-desktop-link "TeamSpeak" "$APPLICATIONS_DIR/TeamSpeak3-Client-linux_amd64/ts3client_runscript.sh"
+    else
+        echo "Could not find TeamSpeak version!"
+    fi
+}
+
+clear-exit() { clear; exit; }
+trap clear-exit SIGINT
+
+while OPT_APP=$(dialog --default-item "$OPT_APP" --menu "Install Applications" 0 0 10 \
+    "jd-gui" "Install JD-GUI" \
+    "minecraft" "Install Minecraft" \
+    "minecraft-server" "Install Minecraft Server" \
+    "teamspeak" "Install TeamSpeak" \
+    2>&1 >/dev/tty); do
+    clear
+    mkdir "$APPLICATIONS_DIR" 2>/dev/null || true
+    mkdir "$DOWNLOAD_DIR" 2>/dev/null || true
+    (cd "$APPLICATIONS_DIR"; "install-$OPT_APP")
+    echo "Done."
+    sleep 1
+done
+
+clear
