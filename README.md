@@ -53,6 +53,7 @@ Scripts | Description
 [gh-set-user](bin/gh-set-user) | Sets your git name and email based on your GitHub profile.
 [git-mtime](bin/git-mtime) | Set the modified date of the files on a git repository to the last commit date that changed the files.
 [install-applications](bin/install-applications) | A utility to install some applications.
+[install-packages](bin/install-packages) | A utility to install some basic packages.
 [logdata](bin/logdata) | A script to log events and notes throughout the day.
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
 [socks-for-chrome](bin/socks-for-chrome) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.

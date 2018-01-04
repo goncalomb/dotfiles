@@ -1,0 +1,68 @@
+#!/bin/bash
+
+echo_header() {
+  echo -e "\e[1;7m" "$@" "\e[0m"
+  sleep 0.5
+}
+
+read -r -p "This will install some packages on your system, continue (y/n)? " YESNO
+if [[ ! "$YESNO" =~ ^[yY] ]]; then exit; fi
+
+echo_header "ADDITIONAL REPOSITORIES"
+# https://askubuntu.com/a/895790
+if ! grep "repos/vscode" /etc/apt/sources.list.d/additional-repositories.list; then
+    sudo add-apt-repository "deb https://packages.microsoft.com/repos/vscode stable main"
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB3E94ADBE1229CF
+fi
+
+echo_header "UPDATE"
+sudo apt-get update
+
+echo_header ESSENTIALS
+sudo apt-get -y install \
+  xterm xclip gnome-terminal gnome-screensaver \
+  build-essential \
+  wget curl \
+  git screen
+
+# java
+echo_header JAVA
+sudo apt-get -y install \
+  openjdk-8-jdk openjdk-8-jdk-headless \
+  openjdk-8-jre openjdk-8-jre-headless \
+  ant maven
+
+# python
+echo_header PYTHON
+sudo apt-get -y install \
+  python python-pip \
+  python3 python3-pip
+sudo pip install --upgrade pip setuptools wheel
+
+# php
+echo_header PHP
+sudo apt-get -y install \
+  php7.0 php-pear \
+  php7.0-curl php7.0-gmp php7.0-imap php7.0-mcrypt php7.0-sqlite3
+sudo phpenmod curl gmp imap mcrypt sqlite3
+sudo pecl install libsodium
+
+# nodejs
+echo_header NODEJS
+sudo apt-get -y install \
+  nodejs npm nodejs-legacy
+
+# apache
+echo_header APACHE
+sudo apt-get -y install \
+  apache2 \
+  libapache2-mod-php7.0
+sudo a2enmod rewrite
+sudo a2enmod headers
+sudo apache2ctl restart
+
+# others
+echo_header OTHERS
+sudo apt-get -y install \
+  code bless whois sqlite3 \
+  transmission
