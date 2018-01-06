@@ -26,6 +26,22 @@ EOF
     chmod +x "$USER_DESKTOP/$1.desktop"
 }
 
+install-eclipse() {
+    echo "Downloading Eclipse..."
+    if [[ `wget -qO - https://www.eclipse.org/downloads/packages/` =~ https?://www.eclipse.org/downloads/download.php\?file=[^\"\']+/(eclipse-java[^\"\'/]+-linux-gtk-x86_64.tar.gz) ]]; then
+        URL="${BASH_REMATCH[0]}&mirror_id=1"
+        FILE_NAME=${BASH_REMATCH[1]}
+        LOCAL_FILE="$DOWNLOAD_DIR/$FILE_NAME"
+        curl -f# -Lo "$LOCAL_FILE" "$URL"
+        echo "Installing Eclipse..."
+        # unzip -q "$LOCAL_FILE" -d "$APPLICATIONS_DIR"
+        tar -zxf "$LOCAL_FILE" -C "$APPLICATIONS_DIR"
+        create-desktop-link "Eclipse" "$APPLICATIONS_DIR/eclipse/eclipse"
+    else
+        echo "Could not find url for Eclipse!"
+    fi
+}
+
 install-jd-gui() {
     echo "Downloading JD-GUI..."
     if [[ `wget -qO - jd.benow.ca` =~ https://github.com/java-decompiler/jd-gui/releases/download/[^/]+/(jd-gui-([^\"]+)\.jar) ]]; then
@@ -116,6 +132,7 @@ clear-exit() { clear; exit; }
 trap clear-exit SIGINT
 
 while OPT_APP=$(dialog --default-item "$OPT_APP" --menu "Install Applications" 0 0 10 \
+    "eclipse" "Install Eclipse (Java)" \
     "jd-gui" "Install JD-GUI" \
     "minecraft" "Install Minecraft" \
     "minecraft-server" "Install Minecraft Server" \
