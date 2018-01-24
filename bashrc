@@ -35,6 +35,12 @@ alias git-problems="curl -s \"https://gist.githubusercontent.com/goncalomb/13f28
 # remote speed test script
 alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 
+# lightdm
+if command -v lightdm > /dev/null; then
+	alias xon="sudo service lightdm start"
+	alias xoff="sudo service lightdm stop"
+fi
+
 # misc
 alias bashrc=". $HOME/.bashrc"
 alias 80="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 80 > /dev/null"
