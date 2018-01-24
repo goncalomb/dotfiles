@@ -65,7 +65,7 @@ install-minecraft() {
     curl -f# -Lo "$LOCAL_FILE" "$URL"
     echo "Installing Minecraft..."
     cp "$LOCAL_FILE" "$APPLICATIONS_DIR/$FILE_NAME"
-    create-desktop-link "Minecraft" "java -jar \"$INSTALL_DIR/$FILE_NAME\""
+    create-desktop-link "Minecraft" "java -jar \"$APPLICATIONS_DIR/$FILE_NAME\""
 }
 
 install-minecraft-server() {
