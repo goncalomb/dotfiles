@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "Starting SOCKS tunnel..."
+# https://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
+ssh -D 8100 -Cnf "$@" sleep 2 || exit
+
+echo "Starting browser..."
+browser-incognito --proxy-server="socks5://localhost:8100" https://ipinfo.io/json

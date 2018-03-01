@@ -46,6 +46,8 @@ If you use GNOME, it's useful to create a `open-terminal.desktop` file on the ex
 Scripts | Description
 --------|------------
 [android-bak](bin/android-bak) | Connect to a Android phone (I use Termux and sshd) and backup some files.
+[browser-incognito](bin/browser-incognito) | Open an independent browser window in incognito mode (Google Chrome).
+[browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
 [composer](bin/composer) | Run PHP composer (with auto-install).
 [drive-serial](bin/drive-serial) | Find the serial number of the physical drive.
 [estore](bin/estore) ([src](bin/src/estore.py)) | Encrypted data storage (to store passwords and other data).
@@ -56,7 +58,6 @@ Scripts | Description
 [install-packages](bin/install-packages) | A utility to install some basic packages.
 [logdata](bin/logdata) | A script to log events and notes throughout the day.
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
-[socks-for-chrome](bin/socks-for-chrome) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
 
 ## License
 

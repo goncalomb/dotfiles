@@ -1,0 +1,11 @@
+#!/bin/bash
+
+BROWSER_CMD="google-chrome"
+if [[ "$(uname -s)" == MINGW* ]]; then
+    BROWSER_CMD="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+fi
+
+TMP_DIR=$(mktemp -d)
+touch "$TMP_DIR/First Run"
+"$BROWSER_CMD" --user-data-dir="$TMP_DIR" --disable-extensions --disable-translate --start-maximized --incognito "$@"
+rm -rf "$TMP_DIR"
