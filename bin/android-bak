@@ -1,5 +1,20 @@
 #!/bin/bash
 
+config() {
+    # run some commands on the remote before the download
+    # run_remote <command>
+    run_remote "rm -r \"/sdcard/DCIM/.thumbnails\" || true"
+
+    # register paths to download
+    # register_path <full-path> <name>
+    register_path "/sdcard/DCIM" "DCIM"
+    register_path "/sdcard/Pictures" "Pictures"
+    register_path "/sdcard/Recording" "Recording"
+    register_path "/data/data/com.termux/files/home/logdata" "logdata" # files from the logdata script
+}
+
+# ------------------------------------------------------------------------------
+
 set -e
 
 if [ -z "$1" ]; then
@@ -15,7 +30,16 @@ DAY_DIR="$LOCAL_DIR/$DAY"
 
 echo "Backup directory: $DAY_DIR"
 
-ssh -T -p "$PORT" "$HOST" << 'EOF'
+TEMP_REMOTE_SCRIPT=$(mktemp)
+TEMP_LOCAL_SCRIPT=$(mktemp)
+
+cleanup() {
+    rm "$TEMP_REMOTE_SCRIPT" "$TEMP_LOCAL_SCRIPT"
+}
+
+trap cleanup EXIT
+
+cat > "$TEMP_REMOTE_SCRIPT" <<'EOF'
 set -e
 
 if ! hash filekeep 2>/dev/null; then
@@ -28,54 +52,18 @@ if ! hash filekeep 2>/dev/null; then
     pip3 install --upgrade "filekeep/"
 fi
 
-run_filekeep() {
-    if [ ! -f "filekeep.xml" ]; then
-        echo "Running filekeep..."
-        filekeep create
-        echo "Fixing mtime..."
-        python << 'EOFF'
-import re, subprocess
-from filekeep.collection import *
-c = 0
-def fix_mtime(entry, path):
-    global c
-    if path != ".":
-        mtime_str = subprocess.check_output(["stat", "-c", "%Y %y", path]).decode("utf-8")
-        mtime_re = re.match("^(\d+) \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.(\d{9}) \+\d{4}$", mtime_str)
-        mtime_new = int(mtime_re.group(1) + mtime_re.group(2))
-        if (entry.mtime != mtime_new):
-            c += 1
-            if abs(entry.mtime - mtime_new) < 1e9:
-                entry.mtime = mtime_new
-            else:
-                raise RuntimeError()
-        print(str(entry.mtime) + " " + path)
-    if isinstance(entry, Directory):
-        for e in entry.entries.values():
-            fix_mtime(e, path + "/" + e.name)
-col = Collection(".")
-fix_mtime(col.directory, ".")
-col.write_data()
-print(str(c) + " mtime fixes")
-EOFF
+process_dir() {
+    if [ -d "$1" ]; then
+        echo "Processing '$1'..."
+        cd "$1"
+        if [ ! -f "filekeep.xml" ]; then
+            echo "Running filekeep..."
+            filekeep create
+        fi
     fi
 }
 
 echo
-
-if [ -d "/sdcard/DCIM" ]; then
-    echo "Processing '/sdcard/DCIM'..."
-    cd "/sdcard/DCIM"
-    rm -rf ".thumbnails" "100ANDRO"
-    run_filekeep
-fi
-
-if [ -d "/sdcard/Recording" ]; then
-    echo "Processing '/sdcard/Recording'..."
-    cd "/sdcard/Recording"
-    run_filekeep
-fi
-
 EOF
 
 download_dir() {
@@ -92,5 +80,18 @@ download_dir() {
     fi
 }
 
-download_dir "/sdcard/DCIM" "$DAY_DIR/DCIM_$DAY"
-download_dir "/sdcard/Recording" "$DAY_DIR/Recording_$DAY"
+run_remote() {
+    echo "$1" >> "$TEMP_REMOTE_SCRIPT"
+}
+
+register_path() {
+    echo "process_dir \"$1\"" >> "$TEMP_REMOTE_SCRIPT"
+    echo "download_dir \"$1\" \"\$DAY_DIR/$2_\$DAY\"" >> "$TEMP_LOCAL_SCRIPT"
+}
+
+# run config
+config
+# do remote work
+cat "$TEMP_REMOTE_SCRIPT" | ssh -T -p "$PORT" "$HOST"
+# do local work
+. "$TEMP_LOCAL_SCRIPT"
