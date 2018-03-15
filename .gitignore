@@ -1,5 +1,5 @@
 /home-spoofing/*.so
 /home-spoofing/system-hash.txt
 /bin/termux/
-/bin/src/composer.phar
+/bin/src/*.phar
 vendor/

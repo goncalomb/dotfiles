@@ -1,0 +1,12 @@
+#!/bin/bash
+
+DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+COMPOSER_PHAR="$DIR/src/phpDocumentor.phar"
+
+if [[ ! -f "$COMPOSER_PHAR" ]]; then
+	echo "Downloading phpDocumentor.phar..."
+	curl -f# -o "$COMPOSER_PHAR" "https://www.phpdoc.org/phpDocumentor.phar" || exit 1
+	chmod +x "$COMPOSER_PHAR"
+fi
+
+php "$COMPOSER_PHAR" "$@"
