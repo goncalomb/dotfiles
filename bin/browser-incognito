@@ -7,5 +7,5 @@ fi
 
 TMP_DIR=$(mktemp -d)
 touch "$TMP_DIR/First Run"
-"$BROWSER_CMD" --user-data-dir="$TMP_DIR" --disable-extensions --disable-translate --start-maximized --incognito "$@"
+"$BROWSER_CMD" --user-data-dir="$TMP_DIR" --password-store=basic --disable-extensions --disable-translate --start-maximized --incognito "$@"
 rm -rf "$TMP_DIR"

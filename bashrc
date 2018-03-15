@@ -13,6 +13,8 @@ else
 	export PATH="$PATH:$DIR/bin"
 fi
 
+export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+
 # prompt variables
 HIS=""
 if [ ! -z "$HOME_IS_SPOOFED" ]; then
@@ -43,6 +45,7 @@ fi
 
 # misc
 alias bashrc=". $HOME/.bashrc"
+alias syslog="tail -n 100 -f /var/log/syslog"
 alias 80="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 80 > /dev/null"
 alias 160="eval \`resize | grep -v \"export\"\`; resize -s \$LINES 160 > /dev/null"
 alias small="resize -s 24 80 > /dev/null"

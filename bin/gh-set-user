@@ -6,7 +6,7 @@ error_reporting(~E_WARNING);
 $context = stream_context_create([
 	'http' => [
 		'method' => 'GET',
-		'user_agent' => 'goncalomb/dotfiles/bin/gh-set-user'
+		'user_agent' => 'goncalomb/dotfiles'
 	]
 ]);
 
