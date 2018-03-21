@@ -160,7 +160,7 @@ if __name__ == "__main__":
     attr = termios.tcgetattr(sys.stdin.fileno())
     exit_message = None
     try:
-        tty.setcbreak(sys.stdin.fileno())
+        tty.setcbreak(sys.stdin.fileno(), termios.TCSADRAIN)
         main(args)
     except KeyboardInterrupt:
         exit_message = "KeyboardInterrupt"
