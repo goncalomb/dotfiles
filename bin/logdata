@@ -16,9 +16,9 @@ prompt_str = ""
 
 def get_datetime(ns=True):
     if ns:
-        return datetime.now(timezone(timedelta(seconds=-time.timezone)))
+        return datetime.now(timezone(timedelta(seconds=-time.altzone)))
     else:
-        return datetime.fromtimestamp(int(time.time()), timezone(timedelta(seconds=-time.timezone)))
+        return datetime.fromtimestamp(int(time.time()), timezone(timedelta(seconds=-time.altzone)))
 
 def get_data_file(dt, mkdir=False):
     path = os.path.join(data_dir, "logdata-" + str(dt.year) + str(dt.month).zfill(2) + ".txt")
