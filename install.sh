@@ -61,8 +61,8 @@ EOF
 	done
 	echo "Creating shortcuts..."
 	mkdir "$DIR_HOME/.shortcuts" 2> /dev/null
-	echo "$DIR/bin/termux/logdata && killall com.termux"  >"$DIR_HOME/.shortcuts/LogText"
-	echo "$DIR/bin/termux/logdata --event && killall com.termux" > "$DIR_HOME/.shortcuts/LogEvent"
+	echo "BASH_ENV=~/.bashrc bash -c \"logdata && kill-termux\"" >"$DIR_HOME/.shortcuts/LogText"
+	echo "BASH_ENV=~/.bashrc bash -c \"logdata --event && kill-termux\"" > "$DIR_HOME/.shortcuts/LogEvent"
 	echo "BASH_ENV=~/.bashrc bash -c sshd-start-stop" > "$DIR_HOME/.shortcuts/StartStopSSHD"
 	echo
 fi

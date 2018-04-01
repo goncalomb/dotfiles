@@ -1,5 +1,15 @@
 #!/bin/bash
 
+kill-termux() {
+    killall com.termux || {
+        PID=$$
+        while [ -e "/proc/$PID" ]; do
+            PID=`/system/bin/ps -p $PID -o ppid= | tr -d " \n"`
+        done
+        kill $PID
+    }
+}
+
 googlecamera-cache-save() {
     set -e
     CACHE_PATH="/sdcard/Android/data/com.google.android.GoogleCamera"
