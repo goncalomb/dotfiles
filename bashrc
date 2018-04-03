@@ -20,11 +20,18 @@ HIS=""
 if [ ! -z "$HOME_IS_SPOOFED" ]; then
 	HIS="\[\e[01;35m\]H "
 fi
-function _ps1_gitbranch {
+_PS1_EXIT=
+_PS1_EXIT_0=
+_ps1_root_color() {
+	[ $EUID == 0 ] && echo -en "\x01\e[1;31m\x02"
+}
+_ps1_gitbranch() {
 	BRANCH=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
 	[[ -n "$BRANCH" ]] && echo -e "\x01\e[01;33m\x02$BRANCH "
 }
-PS1="\[\e[01;32m\]\u@\h\[\e[01;34m\] \w $HIS\$(_ps1_gitbranch)\[\e[01;32m\]>:\[\e[00m\] "
+PS1="\[\e[01;32m\]\$(_ps1_root_color)\u@\h\[\e[01;34m\] \w $HIS\$(_ps1_gitbranch)\n" # first line
+PS1="\${_PS1_EXIT[\#]-\${_PS1_EXIT_0[\$?]-\e[33m(exit status \$?)\e[0m\n}$PS1}\${_PS1_EXIT[\#]=}" # exit status (https://stackoverflow.com/a/27473009)
+PS1="$PS1\[\e[01;32m\]\$(_ps1_root_color)>:\[\e[00m\] " # second line
 PS1="\[\e]0;\u@\h: \w\a\]$PS1" # window title
 PS2="> "
 PS3=""
