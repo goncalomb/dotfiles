@@ -18,12 +18,17 @@ config() {
 set -e
 
 if [ -z "$1" ]; then
-    echo "android-bak <host> [port (default 22)] [backup location (default \$HOME)]"
-    exit
+    >&2 echo "alternative usage:"
+    >&2 echo "  android-bak <host> [port (default 8022)] [backup location (default \$HOME)]"
+    >&2 echo
+    HOST=$(bcast-ip -l android)
+    PORT=8022
+    >&2 echo
+else
+    HOST="$1"
+    PORT="${2:-8022}"
 fi
 
-HOST="$1"
-PORT="${2:-22}"
 LOCAL_DIR="${3:-$HOME}/android-bak"
 DAY=$(date +%Y%m%d)
 DAY_DIR="$LOCAL_DIR/$DAY"
@@ -41,6 +46,11 @@ trap cleanup EXIT
 
 cat > "$TEMP_REMOTE_SCRIPT" <<'EOF'
 set -e
+
+if ! hash rsync 2>/dev/null; then
+    echo "Installing rsync..."
+    pkg install rsync
+fi
 
 if ! hash filekeep 2>/dev/null; then
     echo "Installing filekeep..."
@@ -68,7 +78,7 @@ EOF
 
 download_dir() {
     echo
-    if echo "if [ -d \"$1\" ]; then true; else false; fi" | ssh -T -p "$PORT" "$HOST"; then
+    if echo "if [ -d \"$1\" ]; then true; else false; fi" | ssh -T -p "$PORT" "$HOST" bash; then
         echo "Downloading '$1'..."
         mkdir -p "$2"
         rsync --info=progress2 --info=name0 -av -e "ssh -p $PORT" "$HOST:$1/" "$2" && echo -en "\e[5A\e[0J"
@@ -92,6 +102,6 @@ register_path() {
 # run config
 config
 # do remote work
-cat "$TEMP_REMOTE_SCRIPT" | ssh -T -p "$PORT" "$HOST"
+cat "$TEMP_REMOTE_SCRIPT" | ssh -T -p "$PORT" "$HOST" bash
 # do local work
 . "$TEMP_LOCAL_SCRIPT"
