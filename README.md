@@ -45,7 +45,9 @@ If you use GNOME, it's useful to create a `open-terminal.desktop` file on the ex
 
 Scripts | Description
 --------|------------
-[android-bak](bin/android-bak) | Connect to a Android phone (I use Termux and sshd) and backup some files.
+[android-bak](bin/android-bak) | Connect to Android (I use Termux and sshd) and backup some files.
+[android-ssh](bin/android-ssh) | Connect to Android (using bcast-ip).
+[bcast-ip](bin/bcast-ip) | A simple IPv4 broadcaster.
 [browser-incognito](bin/browser-incognito) | Open an independent browser window in incognito mode (Google Chrome).
 [browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
 [composer](bin/composer) | Run PHP composer (with auto-install).
@@ -57,7 +59,14 @@ Scripts | Description
 [install-applications](bin/install-applications) | A utility to install some applications.
 [install-packages](bin/install-packages) | A utility to install some basic packages.
 [logdata](bin/logdata) | A script to log events and notes throughout the day.
+[phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install).
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
+
+### On Android (Termux)
+
+When installed on Android with Termux, some extra bash functions are available, see [bashrc_termux](bashrc_termux).
+
+If you have Termux:Widget it will create a shortcut for starting/stopping `sshd` that automatically broadcasts the IP. It can be used in conjunction with `android-bak` and `android-ssh` to quickly connect to the Android device.
 
 ## License
 
