@@ -39,6 +39,8 @@ if (preg_match('/^([^\/]+)(?:\/([^\/]+))?$/', $value, $matches)) {
 		} else {
 			echo "Email not found, user.email not set!\n";
 		}
+		echo "Setting personal GitHub URL rewrite (ghme:).\n";
+		passthru('git config --global ' . escapeshellarg('url.git@github.com:' . $matches[1] . '/.insteadOf') . ' ghme:');
 		echo "\n";
 		passthru('git config --global --list');
 	} else {

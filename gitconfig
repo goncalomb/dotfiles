@@ -19,3 +19,14 @@
 	ui = auto
 [push]
 	default = upstream
+
+[url "git@github.com:"]
+	insteadOf = "gh:"
+	insteadOf = "github:"
+
+[url "git@gist.github.com:"]
+	insteadOf = "gist:"
+
+[url "git@bitbucket.org:"]
+	insteadOf = "bb:"
+	insteadOf = "bitbucket:"
