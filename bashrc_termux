@@ -10,14 +10,20 @@ kill-termux() {
     }
 }
 
-googlecamera-cache-save() {
+googlecamera-panorama-save() {(
     set -e
-    CACHE_PATH="/sdcard/Android/data/com.google.android.GoogleCamera"
-    SAVE_PATH="/sdcard/DCIM/googlecamera-cache"
-    mkdir "$SAVE_PATH" 2>/dev/null || true
-    tar -C "$CACHE_PATH" -vzcf "$SAVE_PATH/googlecamera-cache-$(date +%s).tar.gz" cache
-    rm -rf "$CACHE_PATH/cache/"
-}
+    DATA_PATH="/sdcard/Android/data/com.google.android.GoogleCamera"
+    SAVE_PATH="/sdcard/DCIM/googlecamera-panorama"
+    mkdir -p "$SAVE_PATH"
+    for d in cache files; do
+        if [ -d "$DATA_PATH/$d/panorama_sessions" ]; then
+            SAVE_FILE="$SAVE_PATH/googlecamera-panorama-$(date +%s).tar.gz"
+            echo "Saving '$SAVE_FILE'..."
+            tar -C "$DATA_PATH/$d" -vzcf "$SAVE_PATH/googlecamera-panorama-$(date +%s).tar.gz" panorama_sessions
+            rm -rf "$DATA_PATH/$d/panorama_sessions"
+        fi
+    done
+)}
 
 sshd-start-stop() {
     if killall sshd 2> /dev/null; then
