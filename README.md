@@ -59,6 +59,7 @@ Scripts | Description
 [install-applications](bin/install-applications) | A utility to install some applications.
 [install-packages](bin/install-packages) | A utility to install some basic packages.
 [logdata](bin/logdata) | A script to log events and notes throughout the day.
+[mailop](bin/mailop) | Organize emails on imap mailboxes.
 [phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install).
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
 

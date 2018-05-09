@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+
+import argparse, imaplib, getpass, sys, re, email, json
+
+re_address = re.compile('^(?:From:)?\\s*(?:.*<([^<>]+)>|(.*?))\\s*(?:\r\n)*$', re.DOTALL)
+
+def json_read(file):
+    with open(file, 'r') as fp:
+        data = fp.read()
+    return json.loads(data)
+
+def json_write(file, obj):
+    data = json.dumps(obj, indent=4, separators=(',', ':'))
+    with open(file, 'w') as fp:
+        fp.write(data)
+
+def get_address(header):
+    m = re_address.match(header)
+    if m.group(1):
+        return m.group(1)
+    return m.group(2)
+
+def imap_connect(args):
+    conn = imaplib.IMAP4_SSL(args.s)
+    try:
+        conn.login(args.u, getpass.getpass('password for ' + args.u + ': '))
+    except imaplib.IMAP4.error as e:
+        print('login error: ' + e.args[0].decode('iso-8859-1'))
+        sys.exit(1)
+    return conn
+
+def imap_boxes(conn):
+    typ, dat = conn.list()
+    for box in dat:
+        yield box.decode('iso-8859-1').split(' "/" ', 1)
+
+def imap_boxes_select(conn, readonly=True):
+    for flags, mailbox in imap_boxes(conn):
+        _, n = conn.select(mailbox, readonly)
+        n = int(n[0].decode('iso-8859-1'))
+        yield flags, mailbox, n
+
+def imap_box_all_messages(conn):
+    _, uids = conn.uid('SEARCH', None, 'ALL')
+    if uids[0]:
+        uids = uids[0].decode('iso-8859-1').split(' ')
+        uids.reverse()
+        return uids
+    return list()
+
+def imap_box_all_messages_with_author(conn):
+    for uid in imap_box_all_messages(conn):
+        _, dat = conn.uid('FETCH', uid, '(BODY.PEEK[HEADER.FIELDS (From)])')
+        frm = get_address(dat[0][1].decode('iso-8859-1'))
+        yield uid, frm
+
+def imap_get_authors(conn):
+    authors = {}
+    for _, frm in imap_box_all_messages_with_author(conn):
+        if frm in authors:
+            authors[frm] += 1
+        else:
+            authors[frm] = 1
+        print('.', end='', flush=True)
+    print()
+    return authors
+
+def move_inbox_mails(conn, from_map):
+    conn.select('Inbox', False)
+    for uid, frm in imap_box_all_messages_with_author(conn):
+        if frm in from_map:
+            print('moving ' + uid + ' (' + frm + ') to ' + from_map[frm])
+            if conn.uid('COPY', uid, from_map[frm])[0] == 'OK':
+                conn.uid('STORE', uid, '+FLAGS', '(\\Deleted)')
+        else:
+            print(frm + ' not found')
+
+def command_count(args):
+    conn = imap_connect(args)
+
+    total = 0
+    for _, mailbox, n in imap_boxes_select(conn):
+        print(mailbox + ': ' + str(n))
+        total += n
+    print(total)
+
+    conn.close()
+    conn.logout()
+
+def command_organize_by_author(args):
+    conn = imap_connect(args)
+
+    map_file = 'authors_' + args.u + '.json'
+    if args.f:
+        map_file = args.f
+
+    if args.c:
+        all_authors = {}
+        for _, mailbox, n in imap_boxes_select(conn):
+            if mailbox == 'Inbox':
+                continue
+            print(mailbox + ' (' + str(n) + ')')
+            authors = imap_get_authors(conn)
+            for addr, an in authors.items():
+                print(addr + ' (' + str(an) + ')')
+            all_authors[mailbox] = list(authors.keys())
+            json_write(map_file, all_authors)
+    else:
+        from_map = {}
+        for mailbox, authors in json_read(map_file).items():
+            if mailbox == 'Inbox' or mailbox == 'Sent' or mailbox == 'Junk' or mailbox == 'Deleted':
+                continue
+            for addr in authors:
+                if addr in from_map:
+                    print(addr + ' already on mailbox ' + from_map[addr] + ' when adding to mailbox ' + mailbox)
+                else:
+                    from_map[addr] = mailbox
+
+        move_inbox_mails(conn, from_map)
+
+    conn.close()
+    conn.logout()
+
+if __name__ == '__main__':
+    try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-s', required=True, metavar='server', help='imap server')
+        parser.add_argument('-u', required=True, metavar='user', help='imap user (email address)')
+        subparsers = parser.add_subparsers(title='commands', dest='command')
+        subparsers.required = True
+
+        subparsers.add_parser('count', description='count emails per mailbox')
+
+        parser_organize_by_author = subparsers.add_parser('organize-by-author', description='')
+        parser_organize_by_author.add_argument('-f', metavar='map file', help='author map file location')
+        parser_organize_by_author.add_argument('-c', action='store_true', help='create map file')
+
+        args = parser.parse_args()
+        locals()['command_' + args.command.replace('-', '_')](args)
+    except KeyboardInterrupt:
+        pass
