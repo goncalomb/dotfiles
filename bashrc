@@ -1,6 +1,8 @@
 DIR=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
 
 shopt -s expand_aliases
+export HISTFILESIZE=100000
+export HISTSIZE=1000
 
 function confirm {
 	read -r -p "${1:-Are you sure} (y/n)? " YESNO
