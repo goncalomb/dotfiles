@@ -1,5 +1,7 @@
 [alias]
 	d = diff
+	dc = diff --cached
+	co = checkout
 	s = status
 	c = commit
 	ca = commit -a
