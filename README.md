@@ -58,6 +58,7 @@ Scripts | Description
 [git-mtime](bin/git-mtime) | Set the modified date of the files on a git repository to the last commit date that changed the files.
 [install-applications](bin/install-applications) | A utility to install some applications.
 [install-packages](bin/install-packages) | A utility to install some basic packages.
+[install-extra-packages](bin/install-extra-packages) | Installs extra packages using apt-get from external repositories.
 [logdata](bin/logdata) | A script to log events and notes throughout the day.
 [mailop](bin/mailop) | Organize emails on imap mailboxes.
 [phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install).

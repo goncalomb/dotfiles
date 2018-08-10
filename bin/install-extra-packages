@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -e
+
+declare -A REPOSITORIES
+declare -A KEYS
+
+register_package() {
+    REPOSITORIES[$1]=$2
+    KEYS[$1]=$3
+}
+
+# https://www.spotify.com/pt/download/linux/
+register_package spotify-client "deb http://repository.spotify.com stable non-free" 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+# https://code.visualstudio.com/docs/setup/linux
+register_package code "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main" BC528686B50D79E339D3721CEB3E94ADBE1229CF
+# https://www.google.com/linuxrepositories/
+register_package google-chrome-stable "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
+# https://www.runescape.com/download
+register_package runescape-launcher "deb [trusted=yes] https://content.runescape.com/downloads/ubuntu trusty non-free" AAC9264309E4D717441DB9527373B12CE03BEB4B
+
+install_repository() {
+    if [ ! -f "/etc/apt/sources.list.d/$1.list" ]; then
+        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "$3"
+        echo "$2" | sudo tee "/etc/apt/sources.list.d/extra-pkg-$1.list"
+    fi
+}
+
+show_available_packages() {
+    echo "Available packages:"
+    for PACKAGE in "${!REPOSITORIES[@]}"; do
+        echo "  $PACKAGE"
+    done
+}
+
+show_usage() {
+    echo "usage: ${0##*/} [package]..."
+    echo "Installs extra packages using apt-get from external repositories."; echo
+    show_available_packages
+    exit
+}
+
+if [ $# -eq 0 ]; then
+    show_usage
+fi
+
+for PACKAGE in "$@"; do
+    if [ -z "${REPOSITORIES[$PACKAGE]}" ]; then
+        echo "Unknown package '$PACKAGE'."; echo
+        show_available_packages
+        exit
+    fi
+done
+
+for PACKAGE in "$@"; do
+    install_repository "$PACKAGE" "${REPOSITORIES[$PACKAGE]}" "${KEYS[$PACKAGE]}"
+done
+
+sudo apt-get update
+
+for PACKAGE in "$@"; do
+    sudo apt-get install -y "$PACKAGE"
+done
+
+echo "Removing duplicate apt sources..."
+sudo apt-get update -qq 2>&1 | sed -n 's/.* is configured multiple times in \(.*\)\:[0-9]\+ and \(.*\)\:[0-9]\+/\1\n\2/p' | sort | uniq | grep "^/etc/apt/sources.list.d/extra-pkg-" | xargs sudo rm -v 2> /dev/null || true
