@@ -1,0 +1,28 @@
+#!/bin/bash
+
+zone_add() {
+    (
+        echo -e "\n# START-ZONE $1\n"
+        cat
+        echo -e "\n# END-ZONE\n"
+    ) >> "$HOME/.bashrc"
+}
+
+zone_remove() {
+    [ -f "$HOME/.bashrc" ] && sed -i "/^# START-ZONE $1$/,/^# END-ZONE$/d" "$HOME/.bashrc" || true
+}
+
+zone_check() {
+    if [ ! -f "$HOME/.bashrc" ] || sed -n "/^# START-ZONE $1$/{q1}" "$HOME/.bashrc"; then false; else true; fi
+}
+
+if [ "$1" == "add" ]; then
+    zone_check "$2" && exit 1
+    zone_add "$2"
+elif [ "$1" == "remove" ]; then
+    zone_remove "$2"
+elif [ "$1" == "check" ]; then
+    zone_check "$2"
+else
+    echo "usage: ${0##*/} add/remove/check <zone-name>"
+fi

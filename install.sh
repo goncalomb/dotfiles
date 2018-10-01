@@ -38,37 +38,24 @@ function create_dotfile_link {
 	fi
 }
 
-DIR_BIN="$DIR/bin"
-DIR_BIN_TERMUX="$DIR/bin/termux"
-
 if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	echo "Running on a Termux environment!"
-	echo "Patching executable scripts..."
-	mkdir "$DIR_BIN_TERMUX" 2> /dev/null
-	for f in "$DIR_BIN/"*; do
-		if [[ -f "$f" && -x "$f" ]]; then
-			i=$(sed -nE "s/^#\!.*\/[sx]?bin\/(.*)/\1/p" "$f" | head -n 1)
-			if [[ -n "$i" ]]; then
-				b=$(basename "$f")
-				cat << EOF > "$DIR_BIN_TERMUX/$b"
-#!$PREFIX/bin/bash
-DIR=\$(cd -P -- "\$(dirname -- "\${BASH_SOURCE[0]}")" && pwd -P)
-$PREFIX/bin/$i "\$DIR/../$b" "\$@"
-EOF
-				chmod +x "$DIR_BIN_TERMUX/$b"
-			fi
-		fi
-	done
-	echo "Creating shortcuts..."
+	echo "Creating Termux:Widget shortcuts..."
 	mkdir "$DIR_HOME/.shortcuts" 2> /dev/null
-	echo "BASH_ENV=~/.bashrc bash -c \"logdata && kill-termux\"" >"$DIR_HOME/.shortcuts/LogText"
-	echo "BASH_ENV=~/.bashrc bash -c \"logdata --event && kill-termux\"" > "$DIR_HOME/.shortcuts/LogEvent"
-	echo "BASH_ENV=~/.bashrc bash -c sshd-start-stop" > "$DIR_HOME/.shortcuts/StartStopSSHD"
+	echo "LD_PRELOAD=\${PREFIX}/lib/libtermux-exec.so BASH_ENV=~/.bashrc bash -c \"logdata && kill-termux\"" >"$DIR_HOME/.shortcuts/LogText"
+	echo "LD_PRELOAD=\${PREFIX}/lib/libtermux-exec.so BASH_ENV=~/.bashrc bash -c \"logdata --event && kill-termux\"" > "$DIR_HOME/.shortcuts/LogEvent"
+	echo "LD_PRELOAD=\${PREFIX}/lib/libtermux-exec.so BASH_ENV=~/.bashrc bash -c sshd-start-stop" > "$DIR_HOME/.shortcuts/StartStopSSHD"
 	echo
 fi
 
 echo "Installing dotfiles..."
-create_dotfile_link "bashrc"
+
+bashrc-zone remove goncalomb-dotfiles
+bashrc-zone add goncalomb-dotfiles << EOF
+if [ -f "$DIR/bashrc" ]; then
+	. "$DIR/bashrc"
+fi
+EOF
 
 if confirm_remove "$DIR_HOME/.gitconfig"; then
 	echo

@@ -9,12 +9,7 @@ function confirm {
 	if [[ "$YESNO" =~ ^[yY] ]]; then true; else false; fi
 }
 
-if [[ "$PREFIX" == *"/com.termux/"* ]]; then
-	export PATH="$PATH:$DIR/bin/termux"
-else
-	export PATH="$PATH:$DIR/bin"
-fi
-
+export PATH="$PATH:$DIR/bin"
 export PATH="$PATH:$HOME/.config/composer/vendor/bin"
 
 # prompt variables

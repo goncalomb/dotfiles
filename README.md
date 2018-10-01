@@ -47,6 +47,7 @@ Scripts | Description
 --------|------------
 [android-bak](bin/android-bak) | Connect to Android (I use Termux and sshd) and backup some files.
 [android-ssh](bin/android-ssh) | Connect to Android (using bcast-ip).
+[bashrc-zone](bin/bashrc-zone) | Manage bashrc zones.
 [bcast-ip](bin/bcast-ip) | A simple IPv4 broadcaster.
 [browser-incognito](bin/browser-incognito) | Open an independent browser window in incognito mode (Google Chrome).
 [browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
