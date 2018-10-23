@@ -48,6 +48,7 @@ if command -v lightdm > /dev/null; then
 fi
 
 # misc
+alias e=exit
 alias ~="cd ~"
 alias ..="cd .."
 alias -- -="cd -"

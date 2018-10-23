@@ -12,6 +12,7 @@ config() {
     register_path "/sdcard/Pictures" "Pictures"
     register_path "/sdcard/Recording" "Recording"
     register_path "/sdcard/recordings" "recordings"
+    register_path "/sdcard/beam" "beam"
     register_path "/data/data/com.termux/files/home/logdata" "logdata" # files from the logdata script
 }
 
