@@ -54,8 +54,11 @@ def get_event_stats():
     def get_sugestions(suffix):
         nonlocal events_by_frequency
         suggestions = []
+        re_sugg = None
+        if suffix and suffix.find("-") == -1:
+            re_sugg = re.compile("^" + "\w*-".join(suffix) + "\w*")
         for ev_name in events_by_frequency.keys():
-            if ev_name.startswith(suffix):
+            if ev_name.startswith(suffix) or (re_sugg and re_sugg.match(ev_name)):
                 suggestions.append(ev_name)
         return suggestions
     return last_events, get_sugestions
