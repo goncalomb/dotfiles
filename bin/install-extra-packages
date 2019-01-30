@@ -18,6 +18,10 @@ register_package code "deb [arch=amd64] http://packages.microsoft.com/repos/vsco
 register_package google-chrome-stable "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
 # https://www.runescape.com/download
 register_package runescape-launcher "deb [trusted=yes] https://content.runescape.com/downloads/ubuntu trusty non-free" AAC9264309E4D717441DB9527373B12CE03BEB4B
+# https://docs.docker.com/install/linux/docker-ce/ubuntu/
+register_package docker-ce "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+# https://kubernetes.io/docs/tasks/tools/install-kubectl/
+register_package kubectl "deb https://apt.kubernetes.io/ kubernetes-xenial main" 54A647F9048D5688D7DA2ABE6A030B21BA07F4FB
 
 install_repository() {
     if [ ! -f "/etc/apt/sources.list.d/$1.list" ]; then
