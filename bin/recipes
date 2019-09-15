@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+RECIPES_DIR=$(cd -P -- "$(dirname -- "$0")" && cd ../container-recipes && pwd -P)
+RECIPES_IMAGES_DIR="$RECIPES_DIR/images/"
+RECIPES_ENVS_DIR="$RECIPES_DIR/environments"
+
+RECIPE_NAME=${1%%:*}
+RECIPE_ENV=${1#*:}
+[ "$1" = "$RECIPE_ENV" ] && RECIPE_ENV=
+
+[ -z "$RECIPE_NAME" ] && echo "missing recipe name" && exit 1
+[ ! -d "$RECIPES_IMAGES_DIR/$RECIPE_NAME" ] && echo "recipe '$RECIPE_NAME' not found" && exit 1
+[ ! -z "$RECIPE_ENV" ] && [ ! -f "$RECIPES_ENVS_DIR/$RECIPE_ENV" ] && echo "environment '$RECIPE_ENV' not found" && exit 1
+
+echo "Building image..."
+sudo docker build --tag "$RECIPE_NAME" "$RECIPES_IMAGES_DIR/$RECIPE_NAME"
+
+echo "Starting container..."
+if [ -z "$RECIPE_ENV" ]; then
+    sudo docker run -it --rm  "$RECIPE_NAME"
+else
+    sudo docker run -it --rm --env-file "$RECIPES_ENVS_DIR/$RECIPE_ENV" "$RECIPE_NAME"
+fi

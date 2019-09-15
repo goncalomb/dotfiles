@@ -1,0 +1,18 @@
+set -e
+
+if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ] || [ -z "$AWS_DEFAULT_REGION" ]; then
+    unset AWS_ACCESS_KEY_ID
+    unset AWS_SECRET_ACCESS_KEY
+    unset AWS_DEFAULT_REGION
+    unset AWS_DEFAULT_OUTPUT
+    echo "Credentials missing on environment, running 'aws configure'..."
+    aws configure
+fi
+
+echo "Configuring eks clusters on kubectl..."
+CLUSTERS=$(aws --output text eks list-clusters --query="clusters")
+echo "$CLUSTERS" | xargs -rn 1 aws eks update-kubeconfig --name
+
+unset ENV
+rm .shrc
+set +e
