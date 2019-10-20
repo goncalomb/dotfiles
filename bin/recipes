@@ -16,8 +16,13 @@ RECIPE_ENV=${1#*:}
 
 DOCKER_FILE=$RECIPES_IMAGES_DIR/$RECIPE_NAME/Dockerfile
 
+DOCKER_TAG=recipes/$RECIPE_NAME
+DOCKER_NAME=recipes_${RECIPE_NAME}_${RECIPE_ENV}
+
 DOCKER_BUILD_ARGS=()
 DOCKER_RUN_ARGS=()
+
+REUSE_CONTAINER=
 
 recipe_arg_HOST_DISPLAY() {
     echo "Recipe will have display access."
@@ -62,6 +67,11 @@ apt-get update && \
     )
 }
 
+recipe_arg_REUSE_CONTAINER() {
+    echo "Container will be kept and reused."
+    REUSE_CONTAINER=1
+}
+
 # info
 echo "Recipe '$RECIPE_NAME'."
 if [ -n "$RECIPE_ENV" ]; then
@@ -77,6 +87,17 @@ while read -r LINE; do
     DOCKER_BUILD_ARGS+=(--build-arg RECIPE_$RECIPE_ARG_KEY="${!RECIPE_ARG_KEY:-1}")
 done < <(sed -r 's/^\s*ARG\s*RECIPE_([A-Z0-9_]*)+\s*($|= *(( *[^ ]+)*) *$)/\1=\3R/;t;d' "$DOCKER_FILE")
 
+# consider reusing the container
+if [ -z "$REUSE_CONTAINER" ]; then
+    DOCKER_RUN_ARGS+=(--rm)
+elif [ -n "$(sudo docker container ls --no-trunc -af name="^$DOCKER_NAME\$" --format '{{.ID}}' | head -n1)" ]; then
+    echo "Previous container found!"
+    echo "Remove container with 'sudo docker container rm -f $DOCKER_NAME'."
+    echo "Starting previous container..."
+    sudo docker container start -ai "$DOCKER_NAME"
+    exit 0
+fi
+
 # include env file
 if [ -n "$RECIPE_ENV" ]; then
     DOCKER_RUN_ARGS+=(--env-file "$RECIPES_ENVS_DIR/$RECIPE_ENV")
@@ -84,8 +105,10 @@ fi
 
 # build
 echo "Building image..."
-sudo docker build "${DOCKER_BUILD_ARGS[@]}" --tag "$RECIPE_NAME" "$RECIPES_IMAGES_DIR/$RECIPE_NAME"
+sudo docker build "${DOCKER_BUILD_ARGS[@]}" --tag "$DOCKER_TAG" "$RECIPES_IMAGES_DIR/$RECIPE_NAME"
 
 # run
 echo "Starting container..."
-sudo docker run -it --rm "${DOCKER_RUN_ARGS[@]}" "$RECIPE_NAME"
+sudo docker run -it "${DOCKER_RUN_ARGS[@]}" --name "$DOCKER_NAME" "$DOCKER_TAG"
+
+exit 0
