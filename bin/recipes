@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 RECIPES_DIR=$(cd -P -- "$(dirname -- "$0")" && cd ../container-recipes && pwd -P)
-RECIPES_IMAGES_DIR="$RECIPES_DIR/images/"
+RECIPES_IMAGES_DIR="$RECIPES_DIR/images"
 RECIPES_ENVS_DIR="$RECIPES_DIR/environments"
 
 RECIPE_NAME=${1%%:*}
@@ -14,12 +14,78 @@ RECIPE_ENV=${1#*:}
 [ ! -d "$RECIPES_IMAGES_DIR/$RECIPE_NAME" ] && echo "recipe '$RECIPE_NAME' not found" && exit 1
 [ ! -z "$RECIPE_ENV" ] && [ ! -f "$RECIPES_ENVS_DIR/$RECIPE_ENV" ] && echo "environment '$RECIPE_ENV' not found" && exit 1
 
-echo "Building image..."
-sudo docker build --tag "$RECIPE_NAME" "$RECIPES_IMAGES_DIR/$RECIPE_NAME"
+DOCKER_FILE=$RECIPES_IMAGES_DIR/$RECIPE_NAME/Dockerfile
 
-echo "Starting container..."
-if [ -z "$RECIPE_ENV" ]; then
-    sudo docker run -it --rm  "$RECIPE_NAME"
-else
-    sudo docker run -it --rm --env-file "$RECIPES_ENVS_DIR/$RECIPE_ENV" "$RECIPE_NAME"
+DOCKER_BUILD_ARGS=()
+DOCKER_RUN_ARGS=()
+
+recipe_arg_HOST_DISPLAY() {
+    echo "Recipe will have display access."
+    # https://github.com/mviereck/x11docker/wiki/Short-setups-to-provide-X-display-to-container
+    xhost +SI:localuser:root > /dev/null
+    DOCKER_RUN_ARGS+=(-e DISPLAY="$DISPLAY" -v /tmp/.X11-unix:/tmp/.X11-unix:rw)
+}
+
+recipe_arg_HOST_ALSA() {
+    echo "Recipe will have audio access."
+    # https://github.com/mviereck/x11docker/wiki/Container-sound:-ALSA-or-Pulseaudio
+    DOCKER_RUN_ARGS+=(--device /dev/snd)
+}
+
+recipe_arg_HOST_GPU() {
+    echo "Recipe will have GPU access."
+    # https://github.com/mviereck/x11docker/wiki/Hardware-acceleration
+    while read -r DEV; do
+        DOCKER_RUN_ARGS+=(--device "$DEV")
+    done < <(find /dev/dri /dev/nvidia* /dev/vga_arbiter -maxdepth 0 2>/dev/null)
+}
+
+recipe_arg_HOST_GPU_DEBIAN_INSTALL() {
+    echo "Recipe will install GPU drivers inside the container."
+    # https://github.com/mviereck/x11docker/wiki/NVIDIA-driver-support-for-docker-container
+    HOST_GPU_DEBIAN_INSTALL=$(
+        Nvidiaversion="$(head -n1 </proc/driver/nvidia/version | awk '{ print $8 }')"
+        Driverurl="https://http.download.nvidia.com/XFree86/Linux-x86_64/$Nvidiaversion/NVIDIA-Linux-x86_64-$Nvidiaversion.run"
+        [ -z "$Nvidiaversion" ] && echo "echo \"no nvidia driver detected on host\" && exit 1" || echo "
+apt-get update && \
+    apt-get install --no-install-recommends -y kmod xz-utils wget ca-certificates binutils || exit 1 ; \
+    wget $Driverurl -O /tmp/NVIDIA-installer.run || exit 1 ; \
+    Nvidiaoptions='--accept-license --no-runlevel-check --no-questions --no-backup --ui=none --no-kernel-module --no-nouveau-check' ; \
+    sh /tmp/NVIDIA-installer.run -A | grep -q -- '--install-libglvnd'        && Nvidiaoptions=\"\$Nvidiaoptions --install-libglvnd\" ; \
+    sh /tmp/NVIDIA-installer.run -A | grep -q -- '--no-nvidia-modprobe'      && Nvidiaoptions=\"\$Nvidiaoptions --no-nvidia-modprobe\" ; \
+    sh /tmp/NVIDIA-installer.run -A | grep -q -- '--no-kernel-module-source' && Nvidiaoptions=\"\$Nvidiaoptions --no-kernel-module-source\" ; \
+    sh /tmp/NVIDIA-installer.run \$Nvidiaoptions || { echo 'ERROR: Installation of NVIDIA driver failed.' >&2 ; exit 1 ; } ; \
+    rm /tmp/NVIDIA-installer.run ; \
+    apt-get remove -y kmod xz-utils wget ca-certificates binutils ; \
+    apt-get autoremove -y ; apt-get clean -y
+"
+    )
+}
+
+# info
+echo "Recipe '$RECIPE_NAME'."
+if [ -n "$RECIPE_ENV" ]; then
+    echo "Environment '$RECIPE_ENV'."
 fi
+
+# detect, cleanup and process ARG RECIPE_KEY=VALUE
+while read -r LINE; do
+    RECIPE_ARG_KEY=${LINE%%=*}
+    RECIPE_ARG_VALUE=${LINE#*=}
+    # TODO: check for valid ARG
+    "recipe_arg_$RECIPE_ARG_KEY" "$RECIPE_ARG_VALUE"
+    DOCKER_BUILD_ARGS+=(--build-arg RECIPE_$RECIPE_ARG_KEY="${!RECIPE_ARG_KEY:-1}")
+done < <(sed -r 's/^\s*ARG\s*RECIPE_([A-Z0-9_]*)+\s*($|= *(( *[^ ]+)*) *$)/\1=\3R/;t;d' "$DOCKER_FILE")
+
+# include env file
+if [ -n "$RECIPE_ENV" ]; then
+    DOCKER_RUN_ARGS+=(--env-file "$RECIPES_ENVS_DIR/$RECIPE_ENV")
+fi
+
+# build
+echo "Building image..."
+sudo docker build "${DOCKER_BUILD_ARGS[@]}" --tag "$RECIPE_NAME" "$RECIPES_IMAGES_DIR/$RECIPE_NAME"
+
+# run
+echo "Starting container..."
+sudo docker run -it --rm "${DOCKER_RUN_ARGS[@]}" "$RECIPE_NAME"
