@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# goncalomb, 2020
+
+set -e
+
+DIR="$1_$(date +%s.%N)"
+DEV=$2
+
+[ ! -b "$DEV" ] && echo "'$DEV' is not a block device" && exit 1
+
+sudo -v
+mkdir -p "$DIR" "$DIR/info" "$DIR/part"
+
+{
+    echo "bak-disk 1.0"
+    echo "$DIR"
+    echo "$DEV"
+    echo
+    echo info
+    echo
+
+    lsblk "$DEV" > "$DIR/info/lsblk"
+    echo "lsblk: lsblk DEV > OUT"
+
+    lsblk -JOb "$DEV" > "$DIR/info/lsblk_json"
+    echo "lsblk_json: lsblk -JOb DEV > OUT"
+
+    lsblk -POb "$DEV" > "$DIR/info/lsblk_pairs"
+    echo "lsblk_pairs: lsblk -POb DEV > OUT"
+
+    echo "fdisk: fdisk -l DEV > OUT"
+    sudo fdisk -l "$DEV" > "$DIR/info/fdisk"
+
+    echo "gdisk: gdisk -l DEV > OUT"
+    sudo gdisk -l "$DEV" > "$DIR/info/gdisk"
+
+    echo "udevadm: udevadm info -n DEV > OUT"
+    sudo udevadm info -n "$DEV" > "$DIR/info/udevadm"
+
+    echo "smartctl_a: smartctl -d auto -a DEV > OUT"
+    sudo smartctl -d auto -a "$DEV" > "$DIR/info/smartctl_a" || true
+
+    echo "smartctl_x: smartctl -d auto -x DEV > OUT"
+    sudo smartctl -d auto -x "$DEV" > "$DIR/info/smartctl_x" || true
+
+    echo "head: dd status=progress if=DEV bs=512 count=2048 > OUT"
+    sudo dd status=progress if="$DEV" bs=512 count=2048 > "$DIR/info/head"
+
+    echo "sgdisk_backup: sgdisk -b OUT DEV"
+    sudo sgdisk -b "$DIR/info/sgdisk_backup" "$DEV"
+    sudo chown "$(id -u):$(id -g)" "$DIR/info/sgdisk_backup"
+
+    echo
+    echo part
+    echo
+
+    TMP=$(mktemp -d)
+
+    # mount partitions
+    lsblk -Po name "$DEV" | while IFS= read -r LINE; do
+        eval "$LINE"
+        DEV_PART="/dev/$NAME"
+        [ "$DEV" == "$DEV_PART" ] && continue
+
+        echo "mount '$DEV_PART'"
+        mkdir -p "$TMP/$NAME"
+        sudo mount -t auto -o ro "$DEV_PART" "$TMP/$NAME"
+
+        echo "tar '$NAME'"
+        sudo tar --acls --selinux --xattrs -czf "$DIR/part/$NAME.tar.gz" -C "$TMP" "$NAME"
+        sudo chown "$(id -u):$(id -g)" "$DIR/part/$NAME.tar.gz"
+
+        echo "umount '$DEV_PART'"
+        sudo umount "$TMP/$NAME"
+        rmdir "$TMP/$NAME"
+    done
+
+    rmdir "$TMP"
+
+    # end
+
+    date +%s.%N > "$DIR/end"
+
+} 2>&1 | tee "$DIR/log"
+
+# https://github.com/goncalomb/filekeep
+if command -v filekeep > /dev/null; then
+    filekeep -d "$DIR" create
+fi
