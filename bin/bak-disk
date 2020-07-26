@@ -13,7 +13,7 @@ sudo -v
 mkdir -p "$DIR" "$DIR/info" "$DIR/part"
 
 {
-    echo "bak-disk 1.0"
+    echo "bak-disk 1.1"
     echo "$DIR"
     echo "$DEV"
     echo
@@ -63,16 +63,19 @@ mkdir -p "$DIR" "$DIR/info" "$DIR/part"
         DEV_PART="/dev/$NAME"
         [ "$DEV" == "$DEV_PART" ] && continue
 
-        echo "mount '$DEV_PART'"
         mkdir -p "$TMP/$NAME"
-        sudo mount -t auto -o ro "$DEV_PART" "$TMP/$NAME"
 
-        echo "tar '$NAME'"
-        sudo tar --acls --selinux --xattrs -czf "$DIR/part/$NAME.tar.gz" -C "$TMP" "$NAME"
-        sudo chown "$(id -u):$(id -g)" "$DIR/part/$NAME.tar.gz"
+        (
+            set -e
+            echo "mount '$DEV_PART'"
+            sudo mount -t auto -o ro "$DEV_PART" "$TMP/$NAME"
+            echo "tar '$NAME'"
+            sudo tar --acls --selinux --xattrs -czf "$DIR/part/$NAME.tar.gz" -C "$TMP" "$NAME"
+            sudo chown "$(id -u):$(id -g)" "$DIR/part/$NAME.tar.gz"
+            echo "umount '$DEV_PART'"
+            sudo umount "$TMP/$NAME"
+        ) || true
 
-        echo "umount '$DEV_PART'"
-        sudo umount "$TMP/$NAME"
         rmdir "$TMP/$NAME"
     done
 
