@@ -9,6 +9,10 @@ function confirm {
 	if [[ "$YESNO" =~ ^[yY] ]]; then true; else false; fi
 }
 
+function sudo-or-not {
+	command -v sudo > /dev/null && sudo "$@" || "$@"
+}
+
 export PATH="$PATH:$DIR/bin"
 export PATH="$PATH:$HOME/.config/composer/vendor/bin"
 
@@ -48,6 +52,13 @@ if command -v lightdm > /dev/null; then
 fi
 
 # misc
+alias d=docker
+alias d-run='docker run --rm -ti'
+alias d-run-80='(TAG=$(echo "d-run-80-${PWD##*/}" | tr "[:upper:]" "[:lower:]") && docker build . -t "$TAG" && docker run --rm -p 8080:80 "$TAG")'
+alias g=git
+alias k=kubectl
+alias k-pods='kubectl get pods -o wide'
+alias k-nodes='kubectl get nodes -o wide'
 alias e=exit
 alias ~="cd ~"
 alias ..="cd .."
@@ -77,11 +88,12 @@ alias myip="curl -s https://icanhazip.com/"
 alias myip4="curl -s -4 https://icanhazip.com/"
 alias myhost="curl -s https://icanhazptr.com/"
 alias myhost4="curl -s -4 https://icanhazptr.com/"
+alias arp-local="sudo-or-not arp-scan -lt 2000"
 # https://askubuntu.com/a/184732
-alias z="gnome-screensaver-command -l"
+alias z='gnome-screensaver-command -l'
 # https://askubuntu.com/a/131022
-alias zz="dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Suspend"
-alias zzz="dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate"
+alias zz='dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Suspend || systemctl suspend'
+alias zzz='dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate || systemctl hibernate'
 # https://stuff.goncalomb.com/euromillions.php
 alias em="echo \"EuroMillions Results...\"; curl -s \"https://stuff.goncalomb.com/euromillions.php\" | grep -v ^# | head -n3"
 
