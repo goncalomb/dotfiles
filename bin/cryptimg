@@ -1,0 +1,119 @@
+#!/bin/bash
+
+set -e
+
+random_id() {
+    xxd -l 16 -p /dev/urandom
+}
+
+verify_img_name() {
+    IMG_NAME=${1%.cryptimg.bin}
+    IMG_FILE="$IMG_NAME.cryptimg.bin"
+    [[ ! "$IMG_NAME" =~ ^[a-z-]+$ ]] && echo "invalid name '$IMG_NAME'" && exit 1 || true
+    case "$2" in
+        exists) [ ! -f "$IMG_FILE" ] && echo "'$IMG_FILE' not found" && exit 1 || true ;;
+        *) [ -f "$IMG_FILE" ] && echo "'$IMG_FILE' already exists" && exit 1 || true ;;
+    esac
+}
+
+verify_size() {
+    SIZE=$1
+    [[ ! "$SIZE" =~ ^[0-9]+[MGT]$ ]] && echo "invalid size '$SIZE' (..M, ..G, ..T)" && exit 1 || true
+}
+
+luks_init() {
+    IMG_DEV_ID_FILE="$IMG_NAME.id.cryptimg.txt"
+    IMG_DEV_ID=
+    IMG_DEV=
+    if [ -f "$IMG_DEV_ID_FILE" ]; then
+        IMG_DEV_ID=$(cat "$IMG_DEV_ID_FILE");
+        IMG_DEV="/dev/mapper/$IMG_DEV_ID"
+        if [ ! -b "/dev/mapper/$IMG_DEV_ID" ]; then
+            rm "$IMG_DEV_ID_FILE"
+            IMG_DEV_ID=
+            IMG_DEV=
+        fi
+    fi
+}
+
+luks_open() {
+    if [ -n "$IMG_DEV_ID_FILE" ] && [ -z "$IMG_DEV_ID" ]; then
+        IMG_DEV_ID=$(random_id)
+        IMG_DEV="/dev/mapper/$IMG_DEV_ID"
+        sudo cryptsetup luksOpen "$IMG_FILE" "$IMG_DEV_ID"
+        echo "$IMG_DEV_ID" > "$IMG_DEV_ID_FILE"
+    fi
+}
+
+luks_close() {
+    if [ -n "$IMG_DEV_ID_FILE" ] && [ -n "$IMG_DEV_ID" ]; then
+        if [ -d "$IMG_NAME" ]; then
+            sudo umount "/dev/mapper/$IMG_DEV_ID"
+            rmdir "$IMG_NAME"
+        fi
+        sudo cryptsetup luksClose "$IMG_DEV_ID"
+        rm "$IMG_DEV_ID_FILE"
+    fi
+}
+
+img_mount() {
+    if [ ! -d "$IMG_NAME" ]; then
+        mkdir "$IMG_NAME"
+        sudo mount "/dev/mapper/$IMG_DEV_ID" "$IMG_NAME"
+    fi
+}
+
+cmd_create() {
+    verify_img_name "$1"
+    verify_size "$2"
+
+    echo "creating disk image..."
+    fallocate -l "$SIZE" "$IMG_FILE"
+    cryptsetup -qy luksFormat "$IMG_FILE"
+
+    echo "unlock to continue..."
+    luks_init
+    luks_open
+
+    echo "creating ext4 filesystem..."
+    sudo mkfs.ext4 "/dev/mapper/$IMG_DEV_ID"
+
+    echo "mounting..."
+    img_mount
+
+    UG=$(id -u):$(id -g)
+    sudo chown "$UG" "$IMG_NAME"
+
+    echo "done"
+}
+
+cmd_mount() {
+    verify_img_name "$1" exists
+    luks_init
+    luks_open
+    img_mount
+}
+
+cmd_umount() {
+    verify_img_name "$1" exists
+    luks_init
+    luks_close
+}
+
+cmd_dump() {
+    verify_img_name "$1" exists
+    cryptsetup luksDump "$IMG_FILE"
+}
+
+case "$1" in
+    create) cmd_create $2 $3 ;;
+    mount) cmd_mount $2 ;;
+    umount) cmd_umount $2 ;;
+    dump) cmd_dump $2 ;;
+    *)
+        echo "usage: ${0##*/} create <name> <size-gb>"
+        echo "       ${0##*/} mount <name>"
+        echo "       ${0##*/} umount <name>"
+        echo "       ${0##*/} dump <name>"
+        ;;
+esac
