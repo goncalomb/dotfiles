@@ -7,15 +7,25 @@ set -e
 DIR="$1_$(date +%s.%N)"
 DEV=$2
 
+CREATE_IMAGE=
+if [ "$3" == "img" ]; then
+    CREATE_IMAGE=true
+fi
+
 [ ! -b "$DEV" ] && echo "'$DEV' is not a block device" && exit 1
 
 sudo -v
 mkdir -p "$DIR" "$DIR/info" "$DIR/part"
 
 {
-    echo "bak-disk 1.1"
+    echo "bak-disk 1.2"
     echo "$DIR"
     echo "$DEV"
+    if [ -n "$CREATE_IMAGE" ]; then
+        echo "will create image"
+    else
+        echo "will not create image"
+    fi
     echo
     echo info
     echo
@@ -50,6 +60,13 @@ mkdir -p "$DIR" "$DIR/info" "$DIR/part"
     echo "sgdisk_backup: sgdisk -b OUT DEV"
     sudo sgdisk -b "$DIR/info/sgdisk_backup" "$DEV"
     sudo chown "$(id -u):$(id -g)" "$DIR/info/sgdisk_backup"
+
+    if [ -n "$CREATE_IMAGE" ]; then
+        echo
+        echo img
+        echo
+        sudo dd if="$DEV" bs=1M status=progress | gzip > "$DIR/raw.img.gz"
+    fi
 
     echo
     echo part
