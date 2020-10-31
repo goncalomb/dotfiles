@@ -3,7 +3,7 @@
 config() {
     # run some commands on the remote before the download
     # run_remote <command>
-    run_remote "rm -r \"/sdcard/DCIM/.thumbnails\" || true"
+    # run_remote "rm -r \"/sdcard/DCIM/.thumbnails\" || true"
 
     # register paths to download
     # register_path <full-path> <name>
@@ -12,6 +12,8 @@ config() {
     register_path "/sdcard/Pictures" "Pictures"
     register_path "/sdcard/Recording" "Recording"
     register_path "/sdcard/recordings" "recordings"
+    register_path "/sdcard/Voice Recorder" "Voice_Recorder"
+    register_path "/sdcard/Samsung" "Samsung"
     register_path "/sdcard/beam" "beam"
     register_path "/data/data/com.termux/files/home/logdata" "logdata" # files from the logdata script
 }
@@ -68,10 +70,12 @@ fi
 process_dir() {
     if [ -d "$1" ]; then
         echo "Processing '$1'..."
-        cd "$1"
-        if [ ! -f "filekeep.xml" ]; then
+        D=$(dirname -- "$1")
+        B=$(basename -- "$1")
+        cd "$D"
+        if [ ! -f "$B.filekeep.xml" ]; then
             echo "Running filekeep..."
-            filekeep create
+            filekeep -d "$B" create
         fi
     fi
 }
@@ -84,10 +88,14 @@ download_dir() {
     if echo "if [ -d \"$1\" ]; then true; else false; fi" | ssh -T -p "$PORT" "$HOST" bash; then
         echo "Downloading '$1'..."
         mkdir -p "$2"
-        rsync --info=progress2 --info=name0 -av -e "ssh -p $PORT" "$HOST:$1/" "$2" && echo -en "\e[5A\e[0J"
+        echo "$1"
+        rsync --info=progress2 --info=name0 -av -e "ssh -p $PORT" "$HOST:'$1'/" "$2"
+        rsync --info=progress2 --info=name0 -av -e "ssh -p $PORT" "$HOST:'$1.filekeep.xml'" "$2.filekeep.xml"
         echo "Checking '$2'..."
-        cd "$2"
-        filekeep verify && echo -e "\e[1;37;42mFILES OK\e[0m" || echo -e "\e[1;37;41mSOMETHING IS NOT RIGHT, CHECK THE LOG!\e[0m"
+        D=$(dirname -- "$2")
+        B=$(basename -- "$2")
+        cd "$D"
+        filekeep -d "$B" verify && echo -e "\e[1;37;42mFILES OK\e[0m" || echo -e "\e[1;37;41mSOMETHING IS NOT RIGHT, CHECK THE LOG!\e[0m"
     else
         echo "'$1' not found on remote."
     fi
