@@ -43,15 +43,19 @@ If you use GNOME, it's useful to create a `open-terminal.desktop` file on the ex
 
 ### Scripts
 
+These are not documented extensively, so I recommend that you read them before running. Nevertheless they don't make changes to your system, with the exception of 'install-*' and 'bashrc-zone' probably..
+
 Scripts | Description
 --------|------------
 [android-bak](bin/android-bak) | Connect to Android (I use Termux and sshd) and backup some files.
 [android-ssh](bin/android-ssh) | Connect to Android (using bcast-ip).
+[bak-disk](bin/bak-disk) | Dump disk metadata and contents.
 [bashrc-zone](bin/bashrc-zone) | Manage bashrc zones.
 [bcast-ip](bin/bcast-ip) | A simple IPv4 broadcaster.
 [browser-incognito](bin/browser-incognito) | Open an independent browser window in incognito mode (Google Chrome).
 [browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
 [composer](bin/composer) | Run PHP composer (with auto-install).
+[cryptimg](bin/cryptimg) | Create/Manage/Mount LUKS encrypted images, for storing files securely.
 [drive-serial](bin/drive-serial) | Find the serial number of the physical drive.
 [estore](bin/estore) ([src](bin/src/estore.py)) | Encrypted data storage (to store passwords and other data).
 [gh-clone](bin/gh-clone) | Clone from GitHub with `gh-clone user/repo`.
@@ -63,6 +67,7 @@ Scripts | Description
 [logdata](bin/logdata) | A script to log events and notes throughout the day.
 [mailop](bin/mailop) | Organize emails on imap mailboxes.
 [phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install).
+[recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`.
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
 
 ### On Android (Termux)
