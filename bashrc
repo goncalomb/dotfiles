@@ -1,4 +1,4 @@
-DIR=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 
 shopt -s expand_aliases
 export HISTFILESIZE=100000
@@ -24,11 +24,11 @@ fi
 _PS1_EXIT=
 _PS1_EXIT_0=
 _ps1_root_color() {
-	[ $EUID == 0 ] && echo -en "\x01\e[1;31m\x02"
+	[ $EUID == 0 ] && echo -en "\x01\x1B[1;31m\x02"
 }
 _ps1_gitbranch() {
 	BRANCH=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-	[[ -n "$BRANCH" ]] && echo -e "\x01\e[01;33m\x02$BRANCH "
+	[[ -n "$BRANCH" ]] && echo -e "\x01\x1B[01;33m\x02$BRANCH "
 }
 PS1="\[\e[01;32m\]\$(_ps1_root_color)\u@\h\[\e[01;34m\] \w $HIS\$(_ps1_gitbranch)"$'\n' # first line
 PS1="\${_PS1_EXIT[\#]-\${_PS1_EXIT_0[\$?]-\e[33m(exit status \$?)\e[0m\n}$PS1}\${_PS1_EXIT[\#]=}" # exit status (https://stackoverflow.com/a/27473009)
