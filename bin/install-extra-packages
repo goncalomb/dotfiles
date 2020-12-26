@@ -22,6 +22,8 @@ register_package runescape-launcher "deb [trusted=yes] https://content.runescape
 register_package docker-ce "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
 # https://kubernetes.io/docs/tasks/tools/install-kubectl/
 register_package kubectl "deb https://apt.kubernetes.io/ kubernetes-xenial main" 54A647F9048D5688D7DA2ABE6A030B21BA07F4FB
+# https://www.speedtest.net/apps/cli
+register_package speedtest "deb https://ookla.bintray.com/debian generic main" 379CE192D401AB61
 
 install_repository() {
     if [ ! -f "/etc/apt/sources.list.d/$1.list" ]; then
