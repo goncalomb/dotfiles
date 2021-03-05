@@ -3,3 +3,4 @@
 /bin/termux/
 /bin/src/*.phar
 vendor/
+/tmp/
