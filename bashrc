@@ -123,3 +123,8 @@ source "$DIR/bashrc_ssh"
 if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	source "$DIR/bashrc_termux"
 fi
+
+if [ -d "$DIR/tmp/asdf" ]; then
+	source "$DIR/tmp/asdf/asdf.sh"
+	source "$DIR/tmp/asdf/completions/asdf.bash"
+fi
