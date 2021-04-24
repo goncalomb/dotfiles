@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+! command -v screen >/dev/null && echo "'screen' not found" && exit 1
+! command -v weechat >/dev/null && echo "'weechat' not found" && exit 1
+
+[ ! -d ~/.weechat ] && echo "'~/.weechat' not found, do you use it?" && exit 1
+
+if [ -t 0 ] && [ -t 1 ] && [ -t 2 ]; then
+    # is tty
+    screen -qdRS weechat weechat
+elif ! screen -S weechat -X select . >/dev/null; then
+    echo "not a tty, weechat not running, starting..."
+    screen -qdmS weechat weechat
+    sleep 2
+    if ! screen -S weechat -X select . >/dev/null; then
+        echo "failed to start, session not found, something is not right"
+        exit 1
+    fi
+else
+    echo "not a tty, but weechat is running, nothing to do"
+fi
