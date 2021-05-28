@@ -2,18 +2,21 @@
 
 zone_add() {
     (
-        echo -e "\n# START-ZONE $1\n"
+        [[ -z "$(tail -c 1 "$HOME/.bashrc")" ]] || echo # detect final new line
+        echo "# START-ZONE $1"
+        echo
         cat
-        echo -e "\n# END-ZONE\n"
+        echo
+        echo "# END-ZONE"
     ) >> "$HOME/.bashrc"
 }
 
 zone_remove() {
-    [ -f "$HOME/.bashrc" ] && sed -i "/^# START-ZONE $1$/,/^# END-ZONE$/d" "$HOME/.bashrc" || true
+    [ -f "$HOME/.bashrc" ] && sed -i.bak "/^# START-ZONE $1$/,/^# END-ZONE$/d" "$HOME/.bashrc" || true
 }
 
 zone_check() {
-    if [ ! -f "$HOME/.bashrc" ] || sed -n "/^# START-ZONE $1$/{q1}" "$HOME/.bashrc"; then false; else true; fi
+    if [ ! -f "$HOME/.bashrc" ] || sed -n "/^# START-ZONE $1$/q" "$HOME/.bashrc"; then false; else true; fi
 }
 
 if [ "$1" == "add" ]; then
