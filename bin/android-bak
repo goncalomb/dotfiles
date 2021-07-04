@@ -12,7 +12,7 @@ config() {
     register_path "/sdcard/Pictures" "Pictures"
     register_path "/sdcard/Recording" "Recording"
     register_path "/sdcard/recordings" "recordings"
-    register_path "/sdcard/Voice Recorder" "Voice_Recorder"
+    # register_path "/sdcard/Voice Recorder" "Voice_Recorder"
     register_path "/sdcard/Samsung" "Samsung"
     register_path "/sdcard/beam" "beam"
     register_path "/data/data/com.termux/files/home/logdata" "logdata" # files from the logdata script
@@ -94,8 +94,10 @@ download_dir() {
         echo "Checking '$2'..."
         D=$(dirname -- "$2")
         B=$(basename -- "$2")
-        cd "$D"
-        filekeep -d "$B" verify && echo -e "\e[1;37;42mFILES OK\e[0m" || echo -e "\e[1;37;41mSOMETHING IS NOT RIGHT, CHECK THE LOG!\e[0m"
+        (
+            cd "$D"
+            filekeep -d "$B" verify && echo -e "\e[1;37;42mFILES OK\e[0m" || echo -e "\e[1;37;41mSOMETHING IS NOT RIGHT, CHECK THE LOG!\e[0m"
+        )
     else
         echo "'$1' not found on remote."
     fi
