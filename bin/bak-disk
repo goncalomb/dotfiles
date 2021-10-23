@@ -18,7 +18,7 @@ sudo -v
 mkdir -p "$DIR" "$DIR/info" "$DIR/part"
 
 {
-    echo "bak-disk 1.2"
+    echo "bak-disk 1.3"
     echo "$DIR"
     echo "$DEV"
     if [ -n "$CREATE_IMAGE" ]; then
@@ -26,6 +26,14 @@ mkdir -p "$DIR" "$DIR/info" "$DIR/part"
     else
         echo "will not create image"
     fi
+
+    if [ -n "$CREATE_IMAGE" ]; then
+        echo
+        echo img
+        echo
+        sudo dd if="$DEV" bs=1M status=progress | gzip > "$DIR/raw.img.gz"
+    fi
+
     echo
     echo info
     echo
@@ -60,13 +68,6 @@ mkdir -p "$DIR" "$DIR/info" "$DIR/part"
     echo "sgdisk_backup: sgdisk -b OUT DEV"
     sudo sgdisk -b "$DIR/info/sgdisk_backup" "$DEV"
     sudo chown "$(id -u):$(id -g)" "$DIR/info/sgdisk_backup"
-
-    if [ -n "$CREATE_IMAGE" ]; then
-        echo
-        echo img
-        echo
-        sudo dd if="$DEV" bs=1M status=progress | gzip > "$DIR/raw.img.gz"
-    fi
 
     echo
     echo part
