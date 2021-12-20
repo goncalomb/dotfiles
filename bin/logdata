@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 from __future__ import division, absolute_import, print_function, unicode_literals
 
@@ -7,10 +7,13 @@ import sys, termios, tty
 from curses import ascii
 from datetime import datetime, timezone, timedelta
 import time
+import json
 import os, io
+import subprocess
 import collections, re
 
 data_dir = os.path.join(os.path.expanduser("~"), "logdata")
+tracks_dir = os.path.join(data_dir, "tracks")
 suggestions = None
 prompt_str = ""
 
@@ -98,6 +101,54 @@ def confirm_prompt():
         elif c == "\x0a": # enter
             return True
 
+def start_location_track(name):
+    clear()
+
+    t_start = time.time_ns()
+    path = os.path.join(tracks_dir, name +  "-" + str(t_start) + ".txt")
+
+    try: os.mkdir(os.path.dirname(tracks_dir))
+    except FileExistsError: pass
+    try: os.mkdir(os.path.dirname(path))
+    except FileExistsError: pass
+
+    clear()
+    print("start (" + name + ")")
+
+    head = json.dumps({
+        "version": 1,
+        "type": "termux-gps",
+        "time": t_start,
+        "interval": 5
+    })
+
+    with io.open(path, "w", encoding="utf-8") as fp:
+        fp.write(head + "\n")
+        fp.flush()
+        while True:
+            try:
+                print("next")
+
+                t_before = time.time_ns()
+                out = subprocess.check_output(["termux-location", "-p", "gps", "-r", "once"])
+                t_after = time.time_ns()
+                print(str((t_after - t_before)/1e9))
+
+                result = {
+                    "t_before": t_before,
+                    "t_after": t_after,
+                    "data": json.loads(out)
+                }
+                print("lat: " + str(result["data"]["latitude"]) + ", log: " + str(result["data"]["longitude"]) + ", alt: " + str(result["data"]["altitude"]))
+                print("acc: " + str(result["data"]["accuracy"]))
+                fp.write(json.dumps(result) + "\n")
+                fp.flush()
+
+                time.sleep(5)
+            except KeyboardInterrupt:
+                print("end")
+                break
+
 def save_data(data, data_type="TEXT", ns=True):
     dt = get_datetime(ns)
     data_file = get_data_file(dt, True)
@@ -124,8 +175,12 @@ def main(args):
 
     while True:
         clear()
-        print("Data Logger (" + data_type + ")")
-        print()
+
+        if args.track:
+            print("Track")
+        else:
+            print("Data Logger (" + data_type + ")")
+            print()
 
         if args.event:
             if last_events:
@@ -142,12 +197,15 @@ def main(args):
                     i = (i + 1)%10
                 print()
 
-        n = print_prompt(args.event)
+        n = print_prompt(args.event or args.track)
         if n is not None:
             if n == -2:
                 break
             if n == -1 and prompt_str:
-                if save_data(prompt_str, data_type, args.ns):
+                if args.track:
+                    start_location_track(prompt_str)
+                    break
+                elif save_data(prompt_str, data_type, args.ns):
                     break
             elif args.event and (n > 0 and n <= len(suges) or n == 0 and len(suges) >= 10):
                 if save_data(suges[9 if n == 0 else n - 1], data_type, args.ns):
@@ -155,7 +213,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="logdata")
-    parser.add_argument('--event', action="store_true")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--event', action="store_true")
+    group.add_argument('--track', action="store_true")
     parser.add_argument('--ns', action="store_true")
     args = parser.parse_args()
 
