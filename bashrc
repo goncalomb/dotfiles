@@ -75,6 +75,8 @@ alias clock="while true; do echo -n \`date\`; sleep 0.1; echo -ne \"\r\e[K\"; do
 alias socks="echo \"Starting SOCKS tunnel on port 8100...\"; ssh -D 8100 -CnN --"
 alias clip="xclip -sel clip"
 alias clip-key="xclip -sel clip < ~/.ssh/id_rsa.pub"
+alias rsy="rsync -a --info=progress2"
+alias rsy-dry="rsy --dry-run"
 alias t="date -Is; date +%s.%N | tee >(tr -d \" \n\" | clip)"
 alias random-64k="dd if=/dev/urandom count=128 bs=512 2> /dev/null"
 alias random-md5="random-64k | md5sum | cut -d' ' -f1"
