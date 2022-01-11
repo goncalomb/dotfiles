@@ -2,14 +2,10 @@
 
 set -e
 
-random_id() {
-    xxd -l 16 -p /dev/urandom
-}
-
 verify_img_name() {
     IMG_NAME=${1%.cryptimg.bin}
     IMG_FILE="$IMG_NAME.cryptimg.bin"
-    [[ ! "$IMG_NAME" =~ ^[a-z-]+$ ]] && echo "invalid name '$IMG_NAME'" && exit 1 || true
+    [[ ! "$IMG_NAME" =~ ^[a-z0-9-]+$ ]] && echo "invalid name '$IMG_NAME'" && exit 1 || true
     case "$2" in
         exists) [ ! -f "$IMG_FILE" ] && echo "'$IMG_FILE' not found" && exit 1 || true ;;
         *) [ -f "$IMG_FILE" ] && echo "'$IMG_FILE' already exists" && exit 1 || true ;;
@@ -22,44 +18,43 @@ verify_size() {
 }
 
 luks_init() {
-    IMG_DEV_ID_FILE="$IMG_NAME.id.cryptimg.txt"
-    IMG_DEV_ID=
-    IMG_DEV=
-    if [ -f "$IMG_DEV_ID_FILE" ]; then
-        IMG_DEV_ID=$(cat "$IMG_DEV_ID_FILE");
-        IMG_DEV="/dev/mapper/$IMG_DEV_ID"
-        if [ ! -b "/dev/mapper/$IMG_DEV_ID" ]; then
-            rm "$IMG_DEV_ID_FILE"
-            IMG_DEV_ID=
-            IMG_DEV=
-        fi
-    fi
+    IMG_UUID="$(cryptsetup luksUUID "$IMG_FILE").cryptimg"
+    IMG_DEV="/dev/mapper/$IMG_UUID"
 }
 
 luks_open() {
-    if [ -n "$IMG_DEV_ID_FILE" ] && [ -z "$IMG_DEV_ID" ]; then
-        IMG_DEV_ID=$(random_id)
-        IMG_DEV="/dev/mapper/$IMG_DEV_ID"
-        sudo cryptsetup luksOpen "$IMG_FILE" "$IMG_DEV_ID"
-        echo "$IMG_DEV_ID" > "$IMG_DEV_ID_FILE"
+    if [ ! -b "$IMG_DEV" ]; then
+        if [ "$1" == "ro" ]; then
+            sudo cryptsetup -r luksOpen "$IMG_FILE" "$IMG_UUID"
+        else
+            sudo cryptsetup luksOpen "$IMG_FILE" "$IMG_UUID"
+        fi
     fi
 }
 
 luks_close() {
-    if [ -n "$IMG_DEV_ID_FILE" ] && [ -n "$IMG_DEV_ID" ]; then
-        if [ -d "$IMG_NAME" ]; then
-            sudo umount "/dev/mapper/$IMG_DEV_ID"
-            rmdir "$IMG_NAME"
+    if [ -b "$IMG_DEV" ]; then
+        sudo cryptsetup luksClose "$IMG_UUID"
+    fi
+}
+
+img_umount() {
+    if [ -b "$IMG_DEV" ] && [ -d "$IMG_NAME" ]; then
+        BK_DEVNO=$(mountpoint -qx "$IMG_DEV" || true)
+        FS_DEVNO=$(mountpoint -qd "$IMG_NAME" || true)
+        if [ -n "$BK_DEVNO" ] && [ "$BK_DEVNO" == "$FS_DEVNO" ]; then
+            sudo umount "$IMG_DEV"
         fi
-        sudo cryptsetup luksClose "$IMG_DEV_ID"
-        rm "$IMG_DEV_ID_FILE"
+    fi
+    if [ -d "$IMG_NAME" ]; then
+        rmdir "$IMG_NAME" || true
     fi
 }
 
 img_mount() {
-    if [ ! -d "$IMG_NAME" ]; then
+    if ! mountpoint -qd "$IMG_NAME"; then
         mkdir "$IMG_NAME"
-        sudo mount "/dev/mapper/$IMG_DEV_ID" "$IMG_NAME"
+        sudo mount "$IMG_DEV" "$IMG_NAME"
     fi
 }
 
@@ -69,20 +64,17 @@ cmd_create() {
 
     echo "creating disk image..."
     fallocate -l "$SIZE" "$IMG_FILE"
-    cryptsetup -qy luksFormat "$IMG_FILE"
+    sudo cryptsetup -qy luksFormat "$IMG_FILE"
 
     echo "unlock to continue..."
     luks_init
     luks_open
 
     echo "creating ext4 filesystem..."
-    sudo mkfs.ext4 "/dev/mapper/$IMG_DEV_ID"
+    sudo mkfs.ext4 "$IMG_DEV"
 
     echo "mounting..."
     img_mount
-
-    UG=$(id -u):$(id -g)
-    sudo chown "$UG" "$IMG_NAME"
 
     echo "done"
 }
@@ -90,13 +82,14 @@ cmd_create() {
 cmd_mount() {
     verify_img_name "$1" exists
     luks_init
-    luks_open
+    luks_open "$2"
     img_mount
 }
 
 cmd_umount() {
     verify_img_name "$1" exists
     luks_init
+    img_umount
     luks_close
 }
 
@@ -108,11 +101,13 @@ cmd_dump() {
 case "$1" in
     create) cmd_create $2 $3 ;;
     mount) cmd_mount $2 ;;
+    mount-ro) cmd_mount $2 ro ;;
     umount) cmd_umount $2 ;;
     dump) cmd_dump $2 ;;
     *)
-        echo "usage: ${0##*/} create <name> <size-gb>"
+        echo "usage: ${0##*/} create <name> <size>"
         echo "       ${0##*/} mount <name>"
+        echo "       ${0##*/} mount-ro <name>"
         echo "       ${0##*/} umount <name>"
         echo "       ${0##*/} dump <name>"
         ;;
