@@ -13,8 +13,11 @@ function sudo-or-not {
 	command -v sudo > /dev/null && sudo "$@" || "$@"
 }
 
+[ ! -d "$DIR/bin-extra" ] || export PATH="$PATH:$DIR/bin-extra"
 export PATH="$PATH:$DIR/bin"
-export PATH="$PATH:$HOME/.config/composer/vendor/bin"
+
+# XXX: to delete?
+# export PATH="$PATH:$HOME/.config/composer/vendor/bin"
 
 # prompt variables
 HIS=""
@@ -37,10 +40,6 @@ PS1="\[\e]0;\u@\h: \w\a\]$PS1" # window title
 PS2="> "
 PS3=""
 PS4="+ "
-
-# remote scripts from my gists
-alias img2ico="curl -s \"https://gist.githubusercontent.com/goncalomb/6d879df103fda9b63feb/raw/img2ico.php\" | php --"
-alias git-problems="curl -s \"https://gist.githubusercontent.com/goncalomb/13f28e459fe4dd656e8b43f92c826140/raw/git-problems\" | bash -s -"
 
 # remote speed test script
 alias speed="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
