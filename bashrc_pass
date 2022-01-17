@@ -1,5 +1,7 @@
 #!/bin/bash
 
+return # XXX: old code, don't use anything on this file
+
 function _pass_wait_to_void_clipboard {
 	trap '' SIGINT
 	read -s -t ${PASS_CLIPBOARD_TIME:-20} -p "press enter to continue"; echo

@@ -38,6 +38,7 @@ function create_dotfile_link {
 	fi
 }
 
+# TODO: remove this
 if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	echo "Running on a Termux environment!"
 	echo "Creating Termux:Widget shortcuts..."
@@ -62,5 +63,4 @@ if confirm_remove "$DIR_HOME/.gitconfig"; then
 	truncate --size 0 "$DIR_HOME/.gitconfig"
 	git config --global include.path "~/$DIR_RELATIVE/gitconfig"
 	git config --global core.excludesfile "~/$DIR_RELATIVE/gitignore"
-	gh-set-user
 fi

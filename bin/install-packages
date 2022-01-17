@@ -2,6 +2,8 @@
 
 set -e
 
+# TODO: remove this, move to root
+
 echo_header() {
   echo -e "\e[1;7m" "$@" "\e[0m"
   sleep 0.5
