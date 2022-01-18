@@ -11,7 +11,7 @@ register_package() {
 }
 
 # https://www.spotify.com/pt/download/linux/
-register_package spotify-client "deb http://repository.spotify.com stable non-free" 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+register_package spotify-client "deb http://repository.spotify.com stable non-free" 5E3C45D7B312C643
 # https://code.visualstudio.com/docs/setup/linux
 register_package code "deb [arch=amd64] http://packages.microsoft.com/repos/vscode stable main" BC528686B50D79E339D3721CEB3E94ADBE1229CF
 # https://www.google.com/linuxrepositories/
