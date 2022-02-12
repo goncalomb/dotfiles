@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+URL=$1
+URL_CLEAN=$(echo "$URL" | sed "s/\/\|:\|?\|&\|=/_/g")
+DIR="$(date +%s.%N)_$URL_CLEAN"
+
+mkdir "$DIR"
+cd "$DIR"
+
+echo "dl-single 1.0" >>info.txt
+echo "$URL" >>info.txt
+curl -vsRJOL "$URL" 2>&1 | tee -i log.txt
