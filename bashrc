@@ -16,9 +16,6 @@ function sudo-or-not {
 [ ! -d "$DIR/bin-extra" ] || export PATH="$PATH:$DIR/bin-extra"
 export PATH="$PATH:$DIR/bin"
 
-# XXX: to delete?
-# export PATH="$PATH:$HOME/.config/composer/vendor/bin"
-
 # prompt variables
 HIS=""
 if [ ! -z "$HOME_IS_SPOOFED" ]; then

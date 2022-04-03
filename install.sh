@@ -38,17 +38,6 @@ function create_dotfile_link {
 	fi
 }
 
-# TODO: remove this
-if [[ "$PREFIX" == *"/com.termux/"* ]]; then
-	echo "Running on a Termux environment!"
-	echo "Creating Termux:Widget shortcuts..."
-	mkdir "$DIR_HOME/.shortcuts" 2> /dev/null
-	echo "LD_PRELOAD=\${PREFIX}/lib/libtermux-exec.so BASH_ENV=~/.bashrc bash -c \"logdata && kill-termux\"" >"$DIR_HOME/.shortcuts/LogText"
-	echo "LD_PRELOAD=\${PREFIX}/lib/libtermux-exec.so BASH_ENV=~/.bashrc bash -c \"logdata --event && kill-termux\"" > "$DIR_HOME/.shortcuts/LogEvent"
-	echo "LD_PRELOAD=\${PREFIX}/lib/libtermux-exec.so BASH_ENV=~/.bashrc bash -c sshd-start-stop" > "$DIR_HOME/.shortcuts/StartStopSSHD"
-	echo
-fi
-
 echo "Installing dotfiles..."
 
 bashrc-zone remove goncalomb-dotfiles
