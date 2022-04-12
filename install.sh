@@ -21,25 +21,9 @@ echo "dotfiles directory: $DIR"
 echo "     relative path: $DIR_RELATIVE"
 echo
 
-function confirm_remove {
-	if [ -e "$1" ]; then
-		if ! confirm "$(basename "$1") already exists on HOME, replace"; then
-			false; return
-		fi
-		rm "$1"; return
-	fi
-	true; return
-}
+echo "installing dotfiles..."
 
-function create_dotfile_link {
-	LINK="$DIR_HOME/.$1"
-	if confirm_remove "$LINK"; then
-		ln -sT "$DIR_RELATIVE/$1" "$LINK"
-	fi
-}
-
-echo "Installing dotfiles..."
-
+echo "appending to '~/.bashrc'"
 bashrc-zone remove goncalomb-dotfiles
 bashrc-zone add goncalomb-dotfiles << EOF
 if [ -f "$DIR/bashrc" ]; then
@@ -47,9 +31,9 @@ if [ -f "$DIR/bashrc" ]; then
 fi
 EOF
 
-if confirm_remove "$DIR_HOME/.gitconfig"; then
-	echo
-	truncate --size 0 "$DIR_HOME/.gitconfig"
-	git config --global include.path "~/$DIR_RELATIVE/gitconfig"
-	git config --global core.excludesfile "~/$DIR_RELATIVE/gitignore"
-fi
+echo "setting git config 'include.path'"
+echo "setting git config 'core.excludesfile'"
+git config --global --unset-all include.path "~/$DIR_RELATIVE/gitconfig"
+git config --global --unset-all core.excludesfile "~/$DIR_RELATIVE/gitignore"
+git config --global --add include.path "~/$DIR_RELATIVE/gitconfig"
+git config --global --add core.excludesfile "~/$DIR_RELATIVE/gitignore"

@@ -1,20 +1,31 @@
 # dotfiles
 
-My dotfiles and scripts for your favorite Linux distro (I use [Mint](https://linuxmint.com/download.php)) and [Termux](https://termux.com/) on Android.
+My dotfiles and scripts for your favorite Linux environment, I use [Mint](https://linuxmint.com/) and [Termux](https://termux.com/) on Android.
+
+The install procedure is for bash, usage with other shells is untested, but the scripts should be mostly portable and many are not even shell scripts.
+
+It should work on macOS.
 
 ## Install
 
-Must be installed on you $HOME directory or below! **BE AWARE!** It will prompt you to replace your .bashrc and .gitconfig files! If you don't want to replace your .bashrc just add `source "$HOME/dotfiles/bashrc"` to it. If you just want to use the scripts add `bin/` to your $PATH.
+Must be installed on your $HOME directory or any directory below!
 
     cd ~
     git clone https://github.com/goncalomb/dotfiles.git
     ./dotfiles/install.sh
 
+The install is quite tame and does not make big changes to your system.
+
+* it appends to '~/.bashrc' to source 'bashrc' from this repo
+* it changes the git global config '~/.gitconfig' to add 'include include.path' and 'core.excludesfile'
+
+Please do review the 'install.sh' script if you want. Also, you can just add `source "$HOME/dotfiles/bashrc"` to your init file if you want more control.
+
 ## Contents
 
 ### Bash
 
-A custom PS1 with git branch, some aliases and functions, see [bashrc](bashrc).
+A custom PS1 with git branch, some aliases and functions, see [bashrc](bashrc). When installed on Android with Termux, some extra bash functions are available, see [bashrc_termux](bashrc_termux).
 
 ### Git
 
@@ -69,12 +80,6 @@ Scripts | Description
 [phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install).
 [recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`.
 [sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
-
-### On Android (Termux)
-
-When installed on Android with Termux, some extra bash functions are available, see [bashrc_termux](bashrc_termux).
-
-If you have Termux:Widget it will create a shortcut for starting/stopping `sshd` that automatically broadcasts the IP. It can be used in conjunction with `android-bak` and `android-ssh` to quickly connect to the Android device.
 
 ## License
 
