@@ -8,7 +8,7 @@ It should work on macOS.
 
 ## Install
 
-Must be installed on your $HOME directory or any directory below!
+Must be installed on your HOME directory or any directory below!
 
     cd ~
     git clone https://github.com/goncalomb/dotfiles.git
@@ -23,27 +23,31 @@ Please do review the 'install.sh' script if you want. Also, you can just add `so
 
 ## Contents
 
-### Bash
+### Bash (bashrc)
 
 A custom PS1 with git branch, some aliases and functions, see [bashrc](bashrc). When installed on Android with Termux, some extra bash functions are available, see [bashrc_termux](bashrc_termux).
 
-### Git
+### Git (gitconfig)
 
 A small collection of git aliases [gitconfig](gitconfig).
 
-### Home Spoofing
+### Container Recipes (container-recipes/)
 
-**Advanced, requires gcc, needs more documentation?**
+Specialized Docker container images. *TODO: more documentation.*
 
-With home spoofing you can carry you home directory with you!
+### Home Spoofing (home-spoofing/)
 
-Clone this repository to a external drive, then run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh bash` this will open a new bash instance with the $HOME path set to the external drive (see [spoof.sh](home-spoofing/spoof.sh)). It also compiles and preloads a shared library (see [preload.c](home-spoofing/preload.c)) using LD_PRELOAD, that intercepts some standard C functions to better spoof the HOME directory.
+*This is a very old feature that I don't use for a long time. TODO: test, improve documentation.*
+
+With home spoofing you can carry your home directory with you!
+
+Clone this repository to an external drive, then run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh bash` this will open a new bash instance with the HOME path set to the external drive (see [spoof.sh](home-spoofing/spoof.sh)). It also compiles and preloads a shared library (see [preload.c](home-spoofing/preload.c)) using LD_PRELOAD, which intercepts some standard C functions to better spoof the HOME directory.
 
 All programs started from that shell will see the spoofed HOME directory and use it to store their config files, making your HOME directory portable.
 
 It's not required to start a shell to spoof the HOME for a specific program, just run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh your_program some_argument`.
 
-If you use GNOME, it's useful to create a `open-terminal.desktop` file on the external drive to quickly open a spoofed shell or other programs, example:
+If you use GNOME, it's useful to create a `open-terminal.desktop` file on the external drive to quickly open a spoofed shell or other programs:
 
     [Desktop Entry]
     Terminal=true
@@ -52,9 +56,9 @@ If you use GNOME, it's useful to create a `open-terminal.desktop` file on the ex
     Type=Application
     Icon=gnome-panel-launcher
 
-### Scripts
+### Scripts (bin/)
 
-These are not documented extensively, so I recommend that you read them before running. Nevertheless they don't make changes to your system, with the exception of 'install-*' and 'bashrc-zone' probably..
+These are not documented extensively, so I recommend that you read them before running. Nevertheless, they don't make changes to your system, except for 'install-*' and 'bashrc-zone' probably...
 
 Scripts | Description
 --------|------------
