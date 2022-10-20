@@ -1,5 +1,182 @@
-#!/bin/bash
+#!/bin/env python3
 
-DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+#from __future__ import division, absolute_import, print_function, unicode_literals
 
-python "$DIR/src/estore.py" "$@"
+import os, sys, io, re, json, argparse, getpass, signal
+import simplecrypt
+
+signal.signal(signal.SIGINT, lambda a, b: sys.exit("abort: SIGINT"))
+signal.signal(signal.SIGTERM, lambda a, b: sys.exit("abort: SIGTERM"))
+
+def is_unicode_str(o):
+	try: return type(o) is unicode
+	except NameError: return type(o) is str
+
+def to_unicode_str(o):
+	try: return unicode(o)
+	except NameError: return str(o)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--path", required=True)
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-s", "--set")
+group.add_argument("-u", "--unset", action="store_true")
+parser.add_argument("-f", "--force", action="store_true")
+parser.add_argument("-rs", "--raw-str", action="store_true")
+args = parser.parse_args()
+
+path = args.path.split("/")
+
+listing_keys = len(path) > 1 and not path[-1]
+if listing_keys:
+	path = path[:-1]
+
+if not re.match("^[A-Za-z0-9_-]+$", path[0]): # simple slug
+	sys.exit("error: invalid path root '{}'".format(path[0]))
+for n in path[1:]:
+	if not re.match("^[^\s]+$", n): # no spaces
+		sys.exit("error: invalid path part '{}'".format(n))
+
+if listing_keys and (args.set or args.unset):
+	sys.exit("error: path cannot end in '/' when using --set or --unset")
+
+# find home directory
+dir_home = os.path.expanduser("~")
+if dir_home == "~" or not os.path.exists(dir_home):
+	sys.exit("error: home path not found")
+
+# find .estore directory
+dir_estore = os.path.join(dir_home, ".estore")
+if os.path.lexists(dir_estore):
+	if not os.path.isdir(dir_estore):
+		sys.exit("error: '{}' exists but is not a directory".format(dir_estore))
+else:
+	os.mkdir(dir_estore)
+
+# find the requested file
+the_file = os.path.join(dir_estore, path[0] + ".bin")
+
+key=None
+
+def get_key(new=False):
+	global key
+	if not key:
+		key = getpass.getpass(("NEW " if new else "") + "Encryption Key for '{}': ".format(path[0]))
+		if not key:
+			sys.exit("error: empty key")
+	return key
+
+def read_the_file(required=False):
+	data = None
+	if os.path.lexists(the_file):
+		if os.path.isfile(the_file):
+			with io.open(the_file, "rb") as fp:
+				data = fp.read()
+		else:
+			sys.exit("error: '{}' exists but is not a file".format(the_file))
+	elif required:
+		sys.exit("error: '{}' not found".format(path[0]))
+	if not data:
+		return None
+	# TODO: decrypt
+	try:
+		data = simplecrypt.decrypt(get_key(), data)
+	except simplecrypt.DecryptionException as e:
+		sys.exit("error: decryption error (simple-crypt: {})".format(str(e).lower().rstrip('.')))
+	return json.loads(data)
+
+def write_the_file(obj):
+	data = json.dumps(obj, separators=(',', ':'))
+	data = simplecrypt.encrypt(get_key(True), data)
+	with io.open(the_file, "wb") as fp:
+		fp.write(data)
+
+def remove_the_file():
+	if os.path.lexists(the_file) and os.path.isfile(the_file):
+		os.remove(the_file)
+	else:
+		sys.exit("error: '{}' not found".format(path[0]))
+
+def deep_read(obj, keys):
+	o = obj
+	rel = [keys[0]]
+	for k in keys[1:]:
+		if type(o) is not dict:
+			sys.exit("error: '{}' is not a collection".format("/".join(rel)))
+		rel.append(k)
+		if not k in o:
+			sys.exit("error: '{}' not found".format("/".join(rel)))
+		o = o[k]
+	return o
+
+def deep_write(obj, keys, value):
+	if type(obj) is not dict:
+		sys.exit("error: '{}' is not a collection".format(keys[0]))
+	o = obj
+	rel = [keys[0]]
+	for k in keys[1:-1]:
+		rel.append(k)
+		if not k in o:
+			o[k] = {}
+		elif type(o[k]) is not dict:
+			sys.exit("error: '{}' is not a collection".format("/".join(rel)))
+		o = o[k]
+	if keys[-1] in o:
+		sys.exit("error: cannot overwrite '{}' (use --unset first)".format("/".join(keys)))
+	o[keys[-1]] = value
+
+def deep_delete(obj, keys):
+	if type(obj) is not dict:
+		sys.exit("error: '{}' is not a collection".format(keys[0]))
+	o = obj
+	rel = [keys[0]]
+	for k in keys[1:-1]:
+		rel.append(k)
+		if not k in o:
+			o[k] = {}
+		elif type(o[k]) is not dict:
+			sys.exit("error: '{}' is not a collection".format("/".join(rel)))
+		o = o[k]
+	if not keys[-1] in o:
+		sys.exit("error: '{}' not found".format("/".join(keys)))
+	del o[keys[-1]]
+
+def pretty_print_obj(obj):
+	print(json.dumps(obj, indent=4, separators=(',', ': ')))
+
+if args.set:
+	# writing
+	data = read_the_file()
+	if len(path) == 1:
+		# handle special case when writing to the root
+		if data != None:
+			sys.exit("error: cannot overwrite '{}' (use --unset first)".format(path[0]))
+		data = args.set
+	else:
+		# general case
+		if data == None:
+			data = {}
+		deep_write(data, path, args.set)
+	write_the_file(data)
+elif args.unset:
+	if len(path) == 1:
+		if not args.force:
+			sys.exit("error: cannot unset root without force")
+		remove_the_file()
+	else:
+		data = read_the_file()
+		deep_delete(data, path)
+		write_the_file(data)
+else:
+	# reading
+	data = read_the_file(True)
+	obj = deep_read(data, path)
+	if listing_keys:
+		if type(obj) is not dict:
+			sys.exit("error: '{}' is not a collection".format("/".join(path)))
+		pretty_print_obj(list(obj.keys()))
+	elif args.raw_str and is_unicode_str(obj):
+		sys.stdout.write(obj)
+		sys.stdout.flush()
+	else:
+		pretty_print_obj(obj)
