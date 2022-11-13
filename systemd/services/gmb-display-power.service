@@ -1,0 +1,10 @@
+# https://www.freedesktop.org/software/systemd/man/systemd.service.html
+
+[Unit]
+Description=Control power modes of external displays
+
+[Service]
+ExecStart=/usr/local/sbin/gmb-display-power
+
+[Install]
+WantedBy=multi-user.target

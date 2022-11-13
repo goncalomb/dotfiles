@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+
+# https://www.freedesktop.org/software/systemd/man/org.freedesktop.login1.html
+# https://www.freedesktop.org/wiki/Software/systemd/inhibit/
+# https://dbus.freedesktop.org/doc/dbus-python/index.html
+# https://dbus.freedesktop.org/doc/dbus-python/tutorial.html
+
+import os, dbus, dbus.mainloop.glib
+from gi.repository import GLib
+import monitorcontrol
+
+# TODO: add shutdown and maybe lid-switch?
+
+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+bus = dbus.SystemBus()
+
+login1 = bus.get_object('org.freedesktop.login1', '/org/freedesktop/login1')
+manager = dbus.Interface(login1, 'org.freedesktop.login1.Manager')
+
+inhibit_fd = None
+
+def inhibit_acquire():
+    global inhibit_fd
+    inhibit_fd = manager.Inhibit('sleep', os.path.basename(__file__), "Control power modes of external displays", 'delay')
+
+def inhibit_release():
+    global inhibit_fd
+    del inhibit_fd
+    inhibit_fd = None
+
+def handle_PrepareForSleep(result):
+    if result:
+        print("sleep")
+    else:
+        print("wake")
+
+    try:
+        monitors = monitorcontrol.get_monitors()
+        if result:
+            for m in monitors:
+                with m:
+                    m.set_power_mode(monitorcontrol.PowerMode.off_hard)
+        else:
+            for m in monitors:
+                with m:
+                    m.set_power_mode(monitorcontrol.PowerMode.on)
+    except PermissionError as e:
+        print(e)
+
+    if result:
+        inhibit_release()
+    else:
+        inhibit_acquire()
+
+def main():
+    global bus
+
+    bus.add_signal_receiver(handle_PrepareForSleep, 'PrepareForSleep', 'org.freedesktop.login1.Manager', 'org.freedesktop.login1')
+
+    inhibit_acquire()
+
+    print("waiting for sleep")
+    loop = GLib.MainLoop()
+    loop.run()
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
