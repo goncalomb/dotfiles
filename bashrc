@@ -49,8 +49,11 @@ fi
 
 # misc
 alias d=docker
+alias d-i="docker images ls"
+alias d-c="docker container ls"
+alias d-ca="docker container ls -a"
+alias d-nuke="docker system prune -af --volumes"
 alias d-run='docker run --rm -ti'
-alias d-run-80='(TAG=$(echo "d-run-80-${PWD##*/}" | tr "[:upper:]" "[:lower:]") && docker build . -t "$TAG" && docker run --rm -p 8080:80 "$TAG")'
 alias g=git
 alias k=kubectl
 alias k-pods='kubectl get pods -o wide'
@@ -73,7 +76,7 @@ alias clock="while true; do echo -n \`date\`; sleep 0.1; echo -ne \"\r\e[K\"; do
 alias socks="echo \"Starting SOCKS tunnel on port 8100...\"; ssh -D 8100 -CnN --"
 alias clip="xclip -sel clip"
 alias clip-key="xclip -sel clip < ~/.ssh/id_rsa.pub"
-alias rsy="rsync -a --info=progress2"
+alias rsy="rsync -a --info=progress2 --exclude=\"lost+found\""
 alias rsy-dry="rsy --dry-run"
 alias t="date -Is; date +%s.%N | tee >(tr -d \" \n\" | clip)"
 alias random-64k="dd if=/dev/urandom count=128 bs=512 2> /dev/null"
@@ -86,8 +89,8 @@ alias mylocalip="LANG=c ifconfig | grep -B1 \"inet addr\" | awk '{ if ( \$1 == \
 # https://major.io/icanhazip-com-faq/
 alias myip="curl -s https://icanhazip.com/"
 alias myip4="curl -s -4 https://icanhazip.com/"
-alias myhost="curl -s https://icanhazptr.com/"
-alias myhost4="curl -s -4 https://icanhazptr.com/"
+# alias myhost="curl -s https://icanhazptr.com/"
+# alias myhost4="curl -s -4 https://icanhazptr.com/"
 alias arp-local="sudo-or-not arp-scan -lt 2000"
 # https://askubuntu.com/a/184732
 alias z='xdg-screensaver lock && sleep .2 && xdg-screensaver lock || gnome-screensaver-command -l'
