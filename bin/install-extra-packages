@@ -24,6 +24,8 @@ register_package docker-ce "deb [arch=amd64] https://download.docker.com/linux/u
 register_package kubectl "deb https://apt.kubernetes.io/ kubernetes-xenial main" 54A647F9048D5688D7DA2ABE6A030B21BA07F4FB
 # https://www.speedtest.net/apps/cli
 register_package speedtest "deb https://ookla.bintray.com/debian generic main" 379CE192D401AB61
+# https://www.mono-project.com/download/stable/
+register_package mono-devel "deb https://download.mono-project.com/repo/ubuntu stable main" 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 
 install_repository() {
     if [ ! -f "/etc/apt/sources.list.d/$1.list" ]; then
