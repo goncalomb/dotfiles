@@ -17,4 +17,4 @@ else
     git clone https://github.com/asdf-vm/asdf.git
 fi
 
-git -C asdf checkout "$(git -C asdf describe --abbrev=0 --tags)"
+git -C asdf -c advice.detachedHead=false checkout "$(git -C asdf describe --abbrev=0 --tags)"
