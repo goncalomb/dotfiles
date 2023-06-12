@@ -1,5 +1,7 @@
 DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 
+export DOTFILES_GONCALOMB=$DIR
+
 shopt -s expand_aliases
 export HISTFILESIZE=100000
 export HISTSIZE=1000
