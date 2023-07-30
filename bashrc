@@ -147,6 +147,12 @@ if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	source "$DIR/bashrc_termux"
 fi
 
+if [[ $- == *i* ]] && [ -d "$DIR/tmp/profile.d" ]; then
+	for F in "$DIR/tmp/profile.d/"*; do
+		[ -f "$F" ] && . "$F"
+	done
+fi
+
 if [ -d "$DIR/tmp/asdf" ]; then
 	source "$DIR/tmp/asdf/asdf.sh"
 	source "$DIR/tmp/asdf/completions/asdf.bash"
