@@ -3,8 +3,8 @@
 set -e
 cd -- "$(dirname -- "$0")"
 
-mkdir -p bin-extra
-cd bin-extra
+mkdir -p tmp/bin
+cd tmp/bin
 
 dl_gist() {
     NAME="${1##*/}"

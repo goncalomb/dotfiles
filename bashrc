@@ -15,7 +15,7 @@ function sudo-or-not {
 	command -v sudo > /dev/null && sudo "$@" || "$@"
 }
 
-[ ! -d "$DIR/bin-extra" ] || export PATH="$PATH:$DIR/bin-extra"
+[ ! -d "$DIR/tmp/bin" ] || export PATH="$PATH:$DIR/tmp/bin"
 export PATH="$PATH:$DIR/bin"
 
 # prompt variables

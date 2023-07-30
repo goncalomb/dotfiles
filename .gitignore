@@ -4,4 +4,3 @@
 /bin/src/*.phar
 vendor/
 /tmp/
-/bin-extra/
