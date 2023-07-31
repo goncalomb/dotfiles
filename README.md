@@ -1,12 +1,15 @@
 # dotfiles
 
-My dotfiles and scripts for your favorite Linux environment, I use [Mint](https://linuxmint.com/) and [Termux](https://termux.com/) on Android.
+My dotfiles and scripts.
 
-The install procedure is for bash, usage with other shells is untested, but the scripts should be mostly portable and many are not even shell scripts.
-
-It should work on macOS.
+The install procedure is for bash, usage with other shells is untested, but if you are here just for the scripts, they are mostly portable and many are not even shell scripts.
 
 ## Install
+
+* On **Debian**-based distributions (I use [Mint](https://linuxmint.com/)), just install normally.
+* On **Android** ([Termux](https://termux.com/) environment), just install normally.
+* On **macOS**, the default shell is zsh (zsh support is untested, the install won't update .zshrc). Personally, I just use bash even on macOS (see [utils/darwin-use-brew-bash.sh](utils/darwin-use-brew-bash.sh), requires [Homebrew](https://brew.sh/)). Using bash, just install normally.
+* On **Windows**, it was made to work with Git Bash from [Git for Windows](https://git-scm.com/download/win) which uses MSYS2/MinGW, but current support is untested (personally I haven't installed it on Windows in a long time).
 
 Must be installed on your HOME directory or any directory below!
 
@@ -14,51 +17,74 @@ Must be installed on your HOME directory or any directory below!
     git clone https://github.com/goncalomb/dotfiles.git
     ./dotfiles/install.sh
 
-The install is quite tame and does not make big changes to your system.
+The install procedure is quite tame and does not make big changes to your system:
 
-* it appends to '~/.bashrc' to source 'bashrc' from this repo
-* it changes the git global config '~/.gitconfig' to add 'include include.path' and 'core.excludesfile'
+* it appends to '~/.bashrc' to source [bashrc](bashrc), for PS1, PATHs (for [bin](bin) and others), aliases and other configurations
+* it changes the git user config '~/.gitconfig' to add 'include.path' ([gitconfig](gitconfig)) and 'core.excludesfile' ([gitignore](gitignore))
 
-Please do review the 'install.sh' script if you want. Also, you can just add `source "$HOME/dotfiles/bashrc"` to your init file if you want more control.
+Please do review the [install.sh](install.sh) script if you want. All other install scripts and features are optional.
+
+### Personal Note
+
+My personal install procedure is something like this:
+
+    # on macOS: install homebrew (don't setup shellenv, dotfiles includes shellenv setup)
+    cd ~
+    git clone https://github.com/goncalomb/dotfiles.git
+    ./dotfiles/install.sh
+    ./dotfiles/install-profile.sh
+    ./dotfiles/install-asdf.sh
+    ./dotfiles/install-gists.sh
+    # restart the terminal
+    ./dotfiles/utils/darwin-use-brew-bash.sh # on macOS
+    ./dotfiles/install-termux.sh # on Termux
+    # restart the terminal
 
 ## Contents
 
-### Bash (bashrc)
+* [**?**]: experimental features, with limited usefulness
+* [**X**]: old/deprecated features, not tested recently, disabled by default
 
-A custom PS1 with git branch, some aliases and functions, see [bashrc](bashrc). When installed on Android with Termux, some extra bash functions are available, see [bashrc_termux](bashrc_termux).
+### Install Scripts and Utils
 
-### Git (gitconfig)
+These scripts only do local changes that won't affect your system:
 
-A small collection of git aliases [gitconfig](gitconfig).
+* [install.sh](install.sh): main install script (see above, changes '~/.bashrc' and '~/.gitconfig')
+* [install-asdf.sh](install-asdf.sh): install asdf locally
+* [install-gists.sh](install-gists.sh): installs a small subset of [my gists](https://gist.github.com/goncalomb)
+* [install-profile.sh](install-profile.sh): installs some extra environment files and PATHs
 
-### Container Recipes (container-recipes/)
+These scripts may do changes to your system:
 
-Specialized Docker container images. *TODO: more documentation.*
+* [**?**] [install-systemd.sh](install-systemd.sh): installs systemd services (you probably don't want it)
+* [install-termux.sh](install-termux.sh): helps download and install Termux APKs on Termux
+* [utils/darwin-use-brew-bash.sh](utils/darwin-use-brew-bash.sh): for macOS, installs bash from homebrew to replace the outdated version bundled with xcode, set it as the current user's SHELL
 
-### Home Spoofing (home-spoofing/)
+### Bash
 
-*This is a very old feature that I don't use for a long time. TODO: test, improve documentation.*
+* [bashrc](bashrc): custom PS1 with git branch, PATHs, aliases, functions and other configurations
+* [bashrc_termux](bashrc_termux): some aliases and functions for Termux
+* [**?**] [bashrc_ssh](bashrc_ssh): old wrappers for ssh-agent
+* [**X**] [bashrc_pass](bashrc_pass): old attempt at creating a password manager (disabled)
 
-With home spoofing you can carry your home directory with you!
+### Git
 
-Clone this repository to an external drive, then run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh bash` this will open a new bash instance with the HOME path set to the external drive (see [spoof.sh](home-spoofing/spoof.sh)). It also compiles and preloads a shared library (see [preload.c](home-spoofing/preload.c)) using LD_PRELOAD, which intercepts some standard C functions to better spoof the HOME directory.
+* [gitconfig](gitconfig): a small collection of git aliases
+* [gitignore](gitignore): some git ignores
 
-All programs started from that shell will see the spoofed HOME directory and use it to store their config files, making your HOME directory portable.
+### Other Stuff
 
-It's not required to start a shell to spoof the HOME for a specific program, just run `YOUR_DRIVE_LOCATION/dotfiles/home-spoofing/spoof.sh your_program some_argument`.
+* [**?**] [container-recipes](container-recipes): specialized Docker container images, a poof of concept meant to provide a quick way to access some tools and programs without installing them on the host (managed using the [`bin/recipes`](bin/recipes) script)
+* [**?**] [systemd](systemd): a recent attempt at hosting some systemd services (see [install-systemd.sh](install-systemd.sh))
+* [**X**] [home-spoofing](home-spoofing): old feature to provide a portable HOME directory
 
-If you use GNOME, it's useful to create a `open-terminal.desktop` file on the external drive to quickly open a spoofed shell or other programs:
-
-    [Desktop Entry]
-    Terminal=true
-    Name=Terminal
-    Exec=bash -c "$(dirname -- "%k")/dotfiles/home-spoofing/spoof.sh bash"
-    Type=Application
-    Icon=gnome-panel-launcher
-
-### Scripts (bin/)
+### Scripts
 
 These are not documented extensively, so I recommend that you read them before running. Nevertheless, they don't make changes to your system, except for 'install-*' and 'bashrc-zone' probably...
+
+They are mostly GNU/Linux-centric but some may work on other systems. They are available on PATH after installing the dotfiles.
+
+The list is not exhaustive (see [bin](bin)).
 
 Scripts | Description
 --------|------------
