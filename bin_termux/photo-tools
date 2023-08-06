@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+
+import argparse
+import re
+import os
+import time
+
+dir_camera = os.path.join(os.sep, 'sdcard', 'DCIM', 'Camera')
+dir_raw = os.path.join(os.sep, 'sdcard', 'Pictures', 'Raw')
+
+
+def parse_trashed_name(name):
+    m = re.match(r'^\.trashed-(\d+)-(.*)$', name)
+    return (m.group(1), m.group(2)) if m else (None, None)
+
+
+def command_clean_raw(args):
+    def get_img_raw_pairs():
+        imgs = {}
+
+        for f in os.scandir(dir_camera):
+            if f.is_file():
+                name, ext = os.path.splitext(f.name)
+                if ext == '.jpg':
+                    t_time, t_name = parse_trashed_name(name)
+                    imgs[t_name if t_name else name] = f, True if t_time else False
+
+        for f in os.scandir(dir_raw):
+            if f.is_file():
+                name, ext = os.path.splitext(f.name)
+                if ext == '.dng':
+                    t_time, t_name = parse_trashed_name(name)
+                    if t_name:
+                        name = t_name
+                    if name in imgs:
+                        yield name, imgs[name], (f, True if t_time else False)
+                        del imgs[name]
+                    else:
+                        yield name, (None, False), (f, True if t_time else False)
+
+        for name, img in imgs.items():
+            yield name, img, (None, False)
+
+    t = int(time.time())
+
+    for name, (f_img, trashed_img), (f_raw, trashed_raw) in get_img_raw_pairs():
+        if not f_raw:
+            if not trashed_img:
+                print("'%s' without matching '.dng', nothing to do" % f_img.name)
+
+        elif not f_img:
+            print("'%s' without matching '.jpg', delete?" % f_raw.name)
+            if args.delete:
+                if args.force:
+                    print("deleting '%s'" % f_raw.name)
+                    os.unlink(f_raw.path)
+                else:
+                    print("would delete '%s' (use --force)" % f_raw.name)
+
+        elif trashed_img and not trashed_raw:
+            print("'%s' with trashed '.jpg', trash?" % f_raw.name)
+            if args.trash:
+                if args.force:
+                    print("trashing '%s'" % f_raw.name)
+                    dst = os.path.join(
+                        os.path.dirname(f_raw.path), '.trashed-%d-%s' % (t, f_raw.name))
+                    if not os.path.lexists(dst):
+                        os.rename(f_raw.path, dst)
+                else:
+                    print("would trash '%s' (use --force)" % f_raw.name)
+
+        elif not trashed_img and trashed_raw:
+            print("'%s' trashed with existing '.jpg', restore?" % f_raw.name)
+            if args.restore:
+                if args.force:
+                    print("restoring '%s'" % f_raw.name)
+                    ext = os.path.splitext(f_raw.name)[1]
+                    dst = os.path.join(os.path.dirname(
+                        f_raw.path), '%s%s' % (name, ext))
+                    if not os.path.lexists(dst):
+                        os.rename(f_raw.path, dst)
+                else:
+                    print("would restore '%s' (use --force)" % f_raw.name)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog='util')
+
+    subparsers = parser.add_subparsers(
+        title='commands', dest='command', required=True)
+
+    parser_clean_raw = subparsers.add_parser('clean-raw', description='')
+    parser_clean_raw.add_argument(
+        '-r', '--restore', action='store_true', help='restore')
+    parser_clean_raw.add_argument(
+        '-t', '--trash', action='store_true', help='trash')
+    parser_clean_raw.add_argument(
+        '-d', '--delete', action='store_true', help='delete')
+    parser_clean_raw.add_argument(
+        '-f', '--force', action='store_true', help='force')
+    parser_clean_raw.add_argument(
+        '--delete-is-trash', action='store_true', help='force')
+    parser_clean_raw.set_defaults(fn=command_clean_raw)
+
+    args = parser.parse_args()
+    args.fn(args)

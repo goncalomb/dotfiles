@@ -145,6 +145,7 @@ source "$DIR/bashrc_pass"
 source "$DIR/bashrc_ssh"
 if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	source "$DIR/bashrc_termux"
+	export PATH="$PATH:$DIR/bin_termux"
 fi
 
 if [[ $- == *i* ]] && [ -d "$DIR/tmp/profile.d" ]; then
