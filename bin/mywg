@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+cd -- "$(dirname -- "$0")"
+
+cd ../tmp
+
+sudo -v
+
+# using $PWD to show full path on error messages
+{
+    wg-quick up "$PWD/$HOSTNAME.conf" && sudo wg show
+} || {
+    wg-quick down "$PWD/$HOSTNAME.conf"
+}
