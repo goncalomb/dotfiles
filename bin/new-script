@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+FILE=${1:-}
+
+[ -z "$FILE" ] && echo "missing file argument" && exit 1
+[ -e "$FILE" ] && echo "file '$FILE' exists" && exit 1
+
+cat >"$FILE" <<'EOF'
+#!/usr/bin/env bash
+
+set -euo pipefail
+cd -- "$(dirname -- "$0")"
+
+echo "hi!"
+EOF
+
+chmod +x -- "$FILE"
+cat -- "$FILE"
