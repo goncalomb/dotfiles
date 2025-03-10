@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s nullglob
+
+set -x
+rm -rf "$HOME/.ansible/roles"
+rm -rf "$HOME/.ansible/collections"

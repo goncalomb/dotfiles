@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s nullglob
+
+ARGUMENTS=()
+PLAYBOOKS=()
+DD=
+for ARG in "$@"; do
+    [ "$ARG" == "--" ] && DD=1 && continue
+    [ -z "$DD" ] && ARGUMENTS+=("$ARG") || PLAYBOOKS+=("$ARG")
+done
+
+[ ${#PLAYBOOKS[@]} -eq 0 ] && PLAYBOOKS+=(playbook[.]yaml playbook-*.yaml)
+[ ${#PLAYBOOKS[@]} -eq 0 ] && PLAYBOOKS+=(playbook.yaml)
+
+if [ -f requirements.yaml ]; then
+    echo "requirements:"
+    echo "  requirements.yaml"
+fi
+echo "inventory:"
+echo "  inventory.yaml"
+echo "playbooks:"
+for PB in "${PLAYBOOKS[@]}"; do
+    echo "  $PB"
+done
+
+[ -f requirements.yaml ] && ansible-galaxy install -r requirements.yaml
+ansible-playbook -i inventory.yaml "${ARGUMENTS[@]}" -- "${PLAYBOOKS[@]}"
