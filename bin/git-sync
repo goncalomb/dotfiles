@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-cd -- "$(dirname -- "$0")"
 
 echo "Syncing all branches and tags on all remotes..."
 sleep 2
