@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+cd -- "$(dirname -- "$0")"
+
+echo "Syncing all branches and tags on all remotes..."
+sleep 2
+
+# fetch from all remotes
+git fetch --all
+
+# update (ff-only) local branches from remotes (will fail if diverged)
+BRANCH_C=$(git rev-parse --abbrev-ref HEAD)
+for BRANCH in $(git branch --format='%(refname:short)'); do
+    for REMOTE in $(git remote); do
+        if git merge-base --is-ancestor "$REMOTE/$BRANCH" "$BRANCH"; then
+            : # already up to date
+        elif [[ "$BRANCH" == "$BRANCH_C" ]]; then
+            # current branch, normal ff-only merge
+            git merge --ff-only "$REMOTE/$BRANCH"
+        else
+            # hack for other branches (also fails if diverged)
+            git fetch . "$REMOTE/$BRANCH:$BRANCH"
+        fi
+    done
+done
+
+# push to all remotes
+for REMOTE in $(git remote); do
+    git push --all "$REMOTE"
+    git push --tags "$REMOTE"
+done
