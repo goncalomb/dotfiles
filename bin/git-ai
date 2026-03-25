@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+NAME_SUFFIX=" (+AI)"
+EMAIL_SUFFIX="+ai"
+
+NAME="$(git config --get user.name)"
+EMAIL="$(git config --get user.email)"
+
+export GIT_AUTHOR_NAME="$NAME$NAME_SUFFIX"
+export GIT_AUTHOR_EMAIL="${EMAIL%@*}$EMAIL_SUFFIX@${EMAIL##*@}"
+
+echo "git-ai: using author '$GIT_AUTHOR_NAME <$GIT_AUTHOR_EMAIL>'"
+
+[ "${#@}" -gt 0 ] && git "$@"
+
+git_no_ai() {
+    git --no-pager log \
+    --author="<$GIT_AUTHOR_EMAIL>" \
+    --grep="(+ai)" --grep="(+AI)" --invert-grep --fixed-strings \
+    "$@"
+}
+
+if [ -n "$(git_no_ai -n1 --format="%h")" ]; then
+    echo "git-ai: some AI commits don't have '(+AI)' in the message"
+    git_no_ai --no-decorate
+fi
