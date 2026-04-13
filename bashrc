@@ -155,6 +155,7 @@ if [[ $- == *i* ]] && [ -d "$DIR/tmp/profile.d" ]; then
 fi
 
 if [ -d "$DIR/tmp/asdf" ]; then
+	# TODO: update asdf to the new go-based version
 	source "$DIR/tmp/asdf/asdf.sh"
-	source "$DIR/tmp/asdf/completions/asdf.bash"
+	source "$DIR/tmp/asdf/internal/completions/asdf.bash"
 fi
