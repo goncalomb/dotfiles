@@ -27,8 +27,10 @@ do_apk() {
     if [ ! -f "$APK_FILE" ]; then
         fdroid_apk_download "$APK_FILE"
     fi
-    xdg-open "$APK_FILE"
-    read -r -p "install the apk now, [ENTER] to continue"
+    if command -v termux-share >/dev/null; then
+        termux-share -d "$APK_FILE"
+        read -r -p "install the apk now, [ENTER] to continue"
+    fi
 }
 
 # XXX: opinionated, i don't need other packages
