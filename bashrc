@@ -148,6 +148,11 @@ if [[ "$PREFIX" == *"/com.termux/"* ]]; then
 	export PATH="$PATH:$DIR/bin_termux"
 fi
 
+# add ~/bin to PATH
+[[ ":$PATH:" != *":$HOME/bin:"* ]] && PATH="$HOME/bin:$PATH"
+# add ~/.local/bin to PATH (e.g. for pipx)
+[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && PATH="$HOME/.local/bin:$PATH"
+
 if [[ $- == *i* ]] && [ -d "$DIR/tmp/profile.d" ]; then
 	for F in "$DIR/tmp/profile.d/"*; do
 		[ -f "$F" ] && . "$F"
