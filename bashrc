@@ -15,8 +15,24 @@ function sudo-or-not {
 	command -v sudo > /dev/null && sudo "$@" || "$@"
 }
 
-[ ! -d "$DIR/tmp/bin" ] || export PATH="$PATH:$DIR/tmp/bin"
-export PATH="$PATH:$DIR/bin"
+PATH_DIRS=(
+	# ~/bin and ~/.local/bin (e.g. for pipx)
+	"$HOME/bin"
+	"$HOME/.local/bin"
+	# https://asdf-vm.com/guide/getting-started.html
+	"${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+	# dotfiles bin directories
+	"$DIR/tmp/bin"
+	"$DIR/bin"
+)
+
+if [[ "${PREFIX:-}" == *"/com.termux/"* ]]; then
+	PATH_DIRS+=("$DIR/bin_termux")
+fi
+
+for P in "${PATH_DIRS[@]}"; do
+	[ -d "$P" ] && [[ ":$PATH:" != *":$P:"* ]] && export PATH="$P:$PATH"
+done
 
 # prompt variables
 HIS=""
@@ -143,21 +159,12 @@ function home-cleanup {
 
 source "$DIR/bashrc_pass"
 source "$DIR/bashrc_ssh"
-if [[ "$PREFIX" == *"/com.termux/"* ]]; then
+if [[ "${PREFIX:-}" == *"/com.termux/"* ]]; then
 	source "$DIR/bashrc_termux"
-	export PATH="$PATH:$DIR/bin_termux"
 fi
-
-# add ~/bin to PATH
-[[ ":$PATH:" != *":$HOME/bin:"* ]] && PATH="$HOME/bin:$PATH"
-# add ~/.local/bin to PATH (e.g. for pipx)
-[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && PATH="$HOME/.local/bin:$PATH"
 
 if [[ $- == *i* ]] && [ -d "$DIR/tmp/profile.d" ]; then
 	for F in "$DIR/tmp/profile.d/"*; do
 		[ -f "$F" ] && . "$F"
 	done
 fi
-
-# https://asdf-vm.com/guide/getting-started.html
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
