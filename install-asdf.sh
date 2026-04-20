@@ -1,20 +1,44 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 cd -- "$(dirname -- "$0")"
 
-! command -v bashrc-zone > /dev/null && echo "'bashrc-zone' not found, are the dotfiles installed?" && exit 1
+# https://asdf-vm.com/guide/getting-started.html
 
-# https://asdf-vm.com/#/core-manage-asdf
-
-mkdir -p tmp
-cd tmp
-
-if [ -d asdf ]; then
-    git -C asdf checkout master
-    git -C asdf pull --ff-only
-else
-    git clone https://github.com/asdf-vm/asdf.git
+if command -v brew >/dev/null; then
+    echo "installing asdf using homebrew..."
+    brew install --formula asdf
+    exit 0
 fi
 
-git -C asdf -c advice.detachedHead=false checkout "$(git -C asdf describe --abbrev=0 --tags)"
+mkdir -p tmp/bin
+cd tmp/bin
+
+UNAME_S="$(uname -s)"
+UNAME_M="$(uname -m)"
+case "$UNAME_M" in
+    i386|i686) ARCH="386" ;;
+    x86_64) ARCH="amd64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+    *) ARCH="$UNAME_M" ;;
+esac
+
+echo "finding latest asdf release..."
+VERSION="$(curl -fsSL "https://api.github.com/repos/asdf-vm/asdf/releases/latest" | grep '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')"
+[ -z "$VERSION" ] && echo "error: failed to find latest asdf release" >&2 && exit 1
+
+NAME="asdf-${VERSION}-${UNAME_S,,}-${ARCH}"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+echo "downloading '$NAME'..."
+curl -fsSL -o "$TMP_DIR/$NAME.tar.gz" "https://github.com/asdf-vm/asdf/releases/download/$VERSION/$NAME.tar.gz"
+
+echo "extracting to '$(pwd)'..."
+tar -xzf "$TMP_DIR/$NAME.tar.gz" asdf
+
+if command -v file >/dev/null; then
+    file asdf
+else
+    echo "done"
+fi
