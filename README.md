@@ -6,6 +6,8 @@ The install procedure is for bash, usage with other shells is untested, but if y
 
 ## Install
 
+### Main install script (`install.sh`)
+
 * On **Debian**-based distributions (I use [Mint](https://linuxmint.com/)), just install normally.
 * On **Android** ([Termux](https://termux.com/) environment), just install normally.
 * On **macOS**, the default shell is zsh (zsh support is untested, the install won't update .zshrc). Personally, I just use bash even on macOS (see [utils/darwin-use-brew-bash.sh](utils/darwin-use-brew-bash.sh), requires [Homebrew](https://brew.sh/)). Using bash, just install normally.
@@ -13,32 +15,52 @@ The install procedure is for bash, usage with other shells is untested, but if y
 
 Must be installed on your HOME directory or any directory below!
 
-    cd ~
-    git clone https://github.com/goncalomb/dotfiles.git
-    ./dotfiles/install.sh
+```bash
+cd ~
+git clone https://github.com/goncalomb/dotfiles.git
+./dotfiles/install.sh
+```
 
 The install procedure is quite tame and does not make big changes to your system:
 
 * it appends to '~/.bashrc' to source [bashrc](bashrc), for PS1, PATHs (for [bin](bin) and others), aliases and other configurations
 * it changes the git user config '~/.gitconfig' to add 'include.path' ([gitconfig](gitconfig)) and 'core.excludesfile' ([gitignore](gitignore))
 
-Please do review the [install.sh](install.sh) script if you want. All other install scripts and features are optional.
+All other install scripts and features are optional.
+
+### Home install script (`install-home.sh`)
+
+The `install-home.sh` script is a more automated installer that also updates and installs system packages (you have been warned).
+
+* it runs `apt`/`pkg` update / upgrade / auto-remove;
+* installs `git` and `python3` on Linux/Termux;
+* installs Homebrew on macOS;
+* installs the dotfiles (using `install.sh`);
+
+It can be run independently, e.g., directly from terminal with `curl`:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/install-home.sh)"
+```
 
 ### Personal Note
 
 My personal install procedure is something like this:
 
-    # on macOS: install homebrew (don't setup shellenv, dotfiles includes shellenv setup)
-    cd ~
-    git clone https://github.com/goncalomb/dotfiles.git
-    ./dotfiles/install.sh
-    ./dotfiles/install-profile.sh
-    ./dotfiles/install-asdf.sh
-    ./dotfiles/install-gists.sh
-    # restart the terminal
-    ./dotfiles/utils/darwin-use-brew-bash.sh # on macOS
-    ./dotfiles/install-termux.sh # on Termux
-    # restart the terminal
+```bash
+# install using install-home.sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/install-home.sh)"
+# install extras
+~/dotfiles/install-asdf.sh
+~/dotfiles/install-gists.sh
+# install other packages and applications (outside this repo)
+# restart the terminal
+~/dotfiles/utils/darwin-use-brew-bash.sh # on macOS
+~/dotfiles/install-termux.sh # on Termux
+# restart the terminal
+```
+
+_I'm currently improving this procedure, and in the future I will update `install-home.sh` to completely automate system bootstrap/updating (using a declarative configuration). --goncalomb_
 
 ## Contents
 
@@ -56,6 +78,7 @@ These scripts only do local changes that won't affect your system:
 
 These scripts may do changes to your system:
 
+* [install-home.sh](install-home.sh): automated installation, updates and installs system packages, installs dotfiles (see above)
 * [**?**] [install-systemd.sh](install-systemd.sh): installs systemd services (you probably don't want it)
 * [install-termux.sh](install-termux.sh): helps download and install Termux APKs on Termux
 * [utils/darwin-use-brew-bash.sh](utils/darwin-use-brew-bash.sh): for macOS, installs bash from homebrew to replace the outdated version bundled with xcode, set it as the current user's SHELL
