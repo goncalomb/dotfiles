@@ -109,30 +109,39 @@ They are mostly GNU/Linux-centric but some may work on other systems. They are a
 
 The list is not exhaustive (see [bin](bin)).
 
-Scripts | Description
---------|------------
-[android-bak](bin/android-bak) | Connect to Android (I use Termux and sshd) and backup some files.
-[android-ssh](bin/android-ssh) | Connect to Android (using bcast-ip).
-[bak-disk](bin/bak-disk) | Dump disk metadata and contents.
-[bashrc-zone](bin/bashrc-zone) | Manage bashrc zones.
-[bcast-ip](bin/bcast-ip) | A simple IPv4 broadcaster.
-[browser-incognito](bin/browser-incognito) | Open an independent browser window in incognito mode (Google Chrome).
-[browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy.
-[composer](bin/composer) | Run PHP composer (with auto-install).
-[cryptimg](bin/cryptimg) | Create/Manage/Mount LUKS encrypted images, for storing files securely.
-[drive-serial](bin/drive-serial) | Find the serial number of the physical drive.
-[estore](bin/estore) ([src](bin/src/estore.py)) | Encrypted data storage (to store passwords and other data).
-[gh-clone](bin/gh-clone) | Clone from GitHub with `gh-clone user/repo`.
-[gh-set-user](bin/gh-set-user) | Sets your git name and email based on your GitHub profile.
-[git-mtime](bin/git-mtime) | Set the modified date of the files on a git repository to the last commit date that changed the files.
-[install-applications](bin/install-applications) | A utility to install some applications.
-[install-packages](bin/install-packages) | A utility to install some basic packages.
-[install-extra-packages](bin/install-extra-packages) | Installs extra packages using apt-get from external repositories.
-[logdata](bin/logdata) | A script to log events and notes throughout the day.
-[mailop](bin/mailop) | Organize emails on imap mailboxes.
-[phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install).
-[recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`.
-[sftp-upload](bin/sftp-upload) ([src](bin/src/sftp-upload/sftp-upload.php)) | A hacked together SFTP uploader script (probably not worth using).
+Scripts | Description | Tags | Updated
+------- | ----------- | ---- | -------
+[a-clear](bin/a-clear) | Clear Ansible cache (roles and collections). | stable, caution | 2025
+[a-playbook](bin/a-playbook) | Run Ansible playbooks (`playbook.yaml` + `playbook-*.yaml`) with `inventory.yaml`, also installs `requirements.yaml`. | stable | 2025
+[android-bak](bin/android-bak) | - | - | -
+[android-ssh](bin/android-ssh) | - | - | -
+[bak-disk](bin/bak-disk) | - | - | -
+[bashrc-zone](bin/bashrc-zone) | - | - | -
+[bcast-ip](bin/bcast-ip) | - | - | -
+[browser-incognito](bin/browser-incognito) | - | - | -
+[browser-socks](bin/browser-socks) | - | - | -
+[composer](bin/composer) | - | - | -
+[cryptimg](bin/cryptimg) | - | - | -
+[dl-single](bin/dl-single) | - | - | -
+[drive-serial](bin/drive-serial) | - | - | -
+[estore](bin/estore) | - | - | -
+[gh-clone](bin/gh-clone) | - | - | -
+[gh-set-user](bin/gh-set-user) | - | - | -
+[git-ai](bin/git-ai) | Git wrapper that adds AI suffix to the author name and email. Usage: `git ai commit ...`. | stable | 2026
+[git-mtime](bin/git-mtime) | - | - | -
+[git-sync](bin/git-sync) | Sync all branches and tags on all remotes (fetch + ff-only merge + push). | stable | 2026
+[install-applications](bin/install-applications) | - | - | -
+[install-extra-packages](bin/install-extra-packages) | - | - | -
+[install-packages](bin/install-packages) | - | - | -
+[irc](bin/irc) | - | - | -
+[logdata](bin/logdata) | - | - | -
+[lspath](bin/lspath) | Lists the directories in PATH. | stable | 2026
+[mailop](bin/mailop) | - | - | -
+[mywg](bin/mywg) | - | - | -
+[new-script](bin/new-script) | Creates a new bash script (using a template). | stable | 2025
+[phpdoc](bin/phpdoc) | - | - | -
+[recipes](bin/recipes) | - | - | -
+[sftp-upload](bin/sftp-upload) | - | - | -
 
 ## License
 

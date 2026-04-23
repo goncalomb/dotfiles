@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "Lists the directories in PATH."
+# author = "goncalomb"
+# year = "2026"
+# tags = ["stable"]
+# ///
+
 set -euo pipefail
 
 echo "PATH=$PATH"

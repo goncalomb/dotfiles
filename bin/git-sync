@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "Sync all branches and tags on all remotes (fetch + ff-only merge + push)."
+# author = "goncalomb"
+# year = "2026"
+# tags = ["stable"]
+# ///
+
 set -euo pipefail
 
 echo "Syncing all branches and tags on all remotes..."

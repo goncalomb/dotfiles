@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "Run Ansible playbooks (`playbook.yaml` + `playbook-*.yaml`) with `inventory.yaml`, also installs `requirements.yaml`."
+# author = "goncalomb"
+# year = "2025"
+# tags = ["stable"]
+# ///
+
 set -euo pipefail
 shopt -s nullglob
 

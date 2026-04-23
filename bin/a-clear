@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "Clear Ansible cache (roles and collections)."
+# author = "goncalomb"
+# year = "2025"
+# tags = ["stable", "caution"]
+# ///
+
 set -euo pipefail
 shopt -s nullglob
 

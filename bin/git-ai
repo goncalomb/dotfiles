@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "Git wrapper that adds AI suffix to the author name and email. Usage: `git ai commit ...`."
+# author = "goncalomb"
+# year = "2026"
+# tags = ["stable"]
+# ///
+
 set -euo pipefail
 
 NAME_SUFFIX=" (+AI)"
