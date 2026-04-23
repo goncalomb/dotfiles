@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Set the modified date of the files on a git repository to the last commit date that changed the files."
+# author = "goncalomb"
+# year = "2017"
+# tags = ["unknown"]
+# ///
+
 git rev-parse HEAD > /dev/null
 if [ $? -ne 0 ]; then
 	exit 1

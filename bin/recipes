@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Run container recipes (see `./container-recipes`), try `recipes rs-osrs`."
+# author = "goncalomb"
+# year = "2019"
+# tags = ["bespoke", "unknown"]
+# ///
+
 set -e
 
 RECIPES_DIR=$(cd -P -- "$(dirname -- "$0")" && cd ../container-recipes && pwd -P)

@@ -1,6 +1,13 @@
 #!/usr/bin/env php
 <?php
 
+# /// dotfiles
+# description = "Sets your git name and email based on your GitHub profile."
+# author = "goncalomb"
+# year = "2017-2018"
+# tags = ["unknown"]
+# ///
+
 error_reporting(~E_WARNING);
 
 $context = stream_context_create([

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Open an independent browser window in incognito mode (Google Chrome)."
+# author = "goncalomb"
+# year = "2018"
+# tags = ["unknown"]
+# ///
+
 BROWSER_CMD="google-chrome"
 if [[ "$(uname -s)" == MINGW* ]]; then
     BROWSER_CMD="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "A hacked together SFTP uploader script (probably not worth using)."
+# author = "goncalomb"
+# year = "2017"
+# tags = ["unknown"]
+# ///
+
 DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 DIR_SFTP_UPLOAD="$DIR/src/sftp-upload"
 

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Find the serial number of the physical drive."
+# author = "goncalomb"
+# year = "2017"
+# tags = ["unknown"]
+# ///
+
 # find the serial number of the physical drive that contains a specific file
 
 DEV_NUMBER_DEC=$(stat -c "%d" -- "${1:-.}")

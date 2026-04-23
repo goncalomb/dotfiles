@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "A utility to install some basic packages."
+# author = "goncalomb"
+# year = "2018"
+# tags = ["bespoke", "unknown", "caution"]
+# ///
+
 set -e
 
 # TODO: remove this, move to root

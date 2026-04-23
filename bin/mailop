@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+# /// dotfiles
+# description = "Organize emails on imap mailboxes."
+# author = "goncalomb"
+# year = "2018"
+# tags = ["unknown"]
+# ///
+
 import argparse, imaplib, getpass, sys, re, email, json
 
 re_address = re.compile('^(?:From:)?\\s*(?:.*<([^<>]+)>|(.*?))\\s*(?:\r\n)*$', re.DOTALL)

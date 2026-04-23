@@ -1,3 +1,10 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Connect to Android (using bcast-ip)."
+# author = "goncalomb"
+# year = "2018"
+# tags = ["bespoke"]
+# ///
+
 ssh -p 8022 $(bcast-ip -l android) "$@"

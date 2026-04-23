@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Connect to Android (I use Termux and sshd) and backup some files."
+# author = "goncalomb"
+# year = "2017-2018, 2020-2022"
+# tags = ["bespoke", "caution"]
+# ///
+
 config() {
     # run some commands on the remote before the download
     # run_remote <command>

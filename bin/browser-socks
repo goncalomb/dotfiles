@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy."
+# author = "goncalomb"
+# year = "2018"
+# tags = ["unknown"]
+# ///
+
 echo "Starting SOCKS tunnel..."
 # https://www.g-loaded.eu/2006/11/24/auto-closing-ssh-tunnels/
 ssh -D 8100 -Cnf "$@" sleep 2 || exit

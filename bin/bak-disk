@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# goncalomb, 2020
+# /// dotfiles
+# description = "Dump disk metadata and contents."
+# author = "goncalomb"
+# year = "2020-2021"
+# tags = ["bespoke", "caution"]
+# ///
 
 set -e
 

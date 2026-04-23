@@ -1,5 +1,12 @@
 #!/usr/bin/python3
 
+# /// dotfiles
+# description = "A script to log events and notes throughout the day."
+# author = "goncalomb"
+# year = "2017-2019, 2021"
+# tags = ["bespoke"]
+# ///
+
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 import argparse

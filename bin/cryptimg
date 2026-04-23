@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Create/Manage/Mount LUKS encrypted images, for storing files securely."
+# author = "goncalomb"
+# year = "2020, 2022"
+# tags = ["bespoke", "caution"]
+# ///
+
 set -e
 
 verify_img_name() {

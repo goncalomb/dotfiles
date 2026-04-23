@@ -1,5 +1,12 @@
 #!/bin/env python3
 
+# /// dotfiles
+# description = "Encrypted data storage (to store passwords and other data)."
+# author = "goncalomb"
+# year = "2017, 2022"
+# tags = ["unknown"]
+# ///
+
 #from __future__ import division, absolute_import, print_function, unicode_literals
 
 import os, sys, io, re, json, argparse, getpass, signal

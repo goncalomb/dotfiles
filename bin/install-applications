@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "A utility to install some applications."
+# author = "goncalomb"
+# year = "2018"
+# tags = ["bespoke", "unknown", "caution"]
+# ///
+
 set -e
 
 USER_HOME=`eval echo ~$USER`

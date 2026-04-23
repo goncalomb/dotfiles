@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Clone from GitHub with `gh-clone user/repo`."
+# author = "goncalomb"
+# year = "2017"
+# tags = ["unknown"]
+# ///
+
 USER_REPO=${@:$#}
 if echo "$USER_REPO" | grep -qiP "^[a-z]+(-[a-z\d]+)*/[\w-]+\$"; then
     git clone "${@:1:$(($#-1))}" "https://github.com/$USER_REPO.git"

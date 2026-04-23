@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Manage bashrc zones."
+# author = "goncalomb"
+# year = "2018, 2021"
+# tags = ["stable"]
+# ///
+
 zone_add() {
     (
         [[ -z "$(tail -c 1 "$HOME/.bashrc")" ]] || echo # detect final new line

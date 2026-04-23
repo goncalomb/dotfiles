@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Installs extra packages using apt-get from external repositories."
+# author = "goncalomb"
+# year = "2018-2020, 2022-2023"
+# tags = ["bespoke", "unknown", "caution"]
+# ///
+
 set -e
 
 declare -A REPOSITORIES

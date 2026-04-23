@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Run PHP composer (with auto-install)."
+# author = "goncalomb"
+# year = "2017"
+# tags = ["unknown"]
+# ///
+
 DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 COMPOSER_PHAR="$DIR/src/composer.phar"
 

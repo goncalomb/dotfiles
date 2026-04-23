@@ -57,6 +57,7 @@ def make_scripts_table(directory: str):
             year = metadata.get('year', '')[-4:] or '-'
             table.append(f'{link} | {description} | {tags} | {year}\n')
         else:
+            print(f"Warning: No metadata found for '{path}'.")
             table.append(f'{link} | - | - | -\n')
     return header, table
 
