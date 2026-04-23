@@ -122,7 +122,7 @@ Scripts | Description | Tags | Updated
 [browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy. | unknown | 2018
 [composer](bin/composer) | Run PHP composer (with auto-install). | unknown | 2017
 [cryptimg](bin/cryptimg) | Create/Manage/Mount LUKS encrypted images, for storing files securely. | bespoke, caution | 2022
-[dl-single](bin/dl-single) | - | - | -
+[dl-single](bin/dl-single) | Downloads a single file from a URL (with metadata). | bespoke | 2022
 [drive-serial](bin/drive-serial) | Find the serial number of the physical drive. | unknown | 2017
 [estore](bin/estore) | Encrypted data storage (to store passwords and other data). | unknown | 2022
 [gh-clone](bin/gh-clone) | Clone from GitHub with `gh-clone user/repo`. | unknown | 2017
@@ -133,11 +133,11 @@ Scripts | Description | Tags | Updated
 [install-applications](bin/install-applications) | A utility to install some applications. | bespoke, unknown, caution | 2018
 [install-extra-packages](bin/install-extra-packages) | Installs extra packages using apt-get from external repositories. | bespoke, unknown, caution | 2023
 [install-packages](bin/install-packages) | A utility to install some basic packages. | bespoke, unknown, caution | 2018
-[irc](bin/irc) | - | - | -
+[irc](bin/irc) | Manages Weechat (IRC client) sessions using screen. | unknown | 2021
 [logdata](bin/logdata) | A script to log events and notes throughout the day. | bespoke | 2021
 [lspath](bin/lspath) | Lists the directories in PATH. | stable | 2026
 [mailop](bin/mailop) | Organize emails on imap mailboxes. | unknown | 2018
-[mywg](bin/mywg) | - | - | -
+[mywg](bin/mywg) | Configures WireGuard from a well-known configuration file. | unknown | 2023
 [new-script](bin/new-script) | Creates a new bash script (using a template). | stable | 2025
 [phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install). | unknown | 2018
 [recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`. | bespoke, unknown | 2019

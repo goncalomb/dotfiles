@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "Configures WireGuard from a well-known configuration file."
+# author = "goncalomb"
+# year = "2023"
+# tags = ["unknown"]
+# ///
+
 set -euo pipefail
 cd -- "$(dirname -- "$0")"
 

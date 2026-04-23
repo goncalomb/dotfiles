@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Manages Weechat (IRC client) sessions using screen."
+# author = "goncalomb"
+# year = "2021"
+# tags = ["unknown"]
+# ///
+
 set -e
 
 ! command -v screen >/dev/null && echo "'screen' not found" && exit 1

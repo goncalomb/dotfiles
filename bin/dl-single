@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "Downloads a single file from a URL (with metadata)."
+# author = "goncalomb"
+# year = "2022"
+# tags = ["bespoke"]
+# ///
+
 set -e
 
 URL=$1
