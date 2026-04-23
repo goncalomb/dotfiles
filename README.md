@@ -23,8 +23,8 @@ git clone https://github.com/goncalomb/dotfiles.git
 
 The install procedure is quite tame and does not make big changes to your system:
 
-* it appends to '~/.bashrc' to source [bashrc](bashrc), for PS1, PATHs (for [bin](bin) and others), aliases and other configurations
-* it changes the git user config '~/.gitconfig' to add 'include.path' ([gitconfig](gitconfig)) and 'core.excludesfile' ([gitignore](gitignore))
+* it appends to `~/.bashrc` to source [bashrc](bashrc), for PS1, PATHs (for [bin](bin) and others), aliases and other configurations
+* it changes the git user config `~/.gitconfig` to add `include.path` ([gitconfig](gitconfig)) and `core.excludesfile` ([gitignore](gitignore))
 
 All other install scripts and features are optional.
 
@@ -71,7 +71,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/
 
 These scripts only do local changes that won't affect your system:
 
-* [install.sh](install.sh): main install script (see above, changes '~/.bashrc' and '~/.gitconfig')
+* [install.sh](install.sh): main install script (see above, changes `~/.bashrc` and `~/.gitconfig`)
 * [install-asdf.sh](install-asdf.sh): install asdf locally
 * [install-gists.sh](install-gists.sh): installs a small subset of [my gists](https://gist.github.com/goncalomb)
 * [install-profile.sh](install-profile.sh): installs some extra environment files and PATHs
@@ -150,6 +150,6 @@ Scripts | Description | Tags | Updated
 [recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`. | bespoke, unknown | 2019
 [sftp-upload](bin/sftp-upload) | A hacked together SFTP uploader script (probably not worth using). | unknown | 2017
 
-# License
+## License
 
 dotfiles is released under the terms of the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
