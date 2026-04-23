@@ -60,7 +60,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/
 # restart the terminal
 ```
 
-_I'm currently improving this procedure, and in the future I will update `install-home.sh` to completely automate system bootstrap/updating (using a declarative configuration). --goncalomb_
+> I'm currently improving this procedure, and in the future I will update `install-home.sh` to completely automate system bootstrap/updating (using a declarative configuration). --goncalomb
 
 ## Contents
 
@@ -101,13 +101,20 @@ These scripts may do changes to your system:
 * [**?**] [systemd](systemd): a recent attempt at hosting some systemd services (see [install-systemd.sh](install-systemd.sh))
 * [**X**] [home-spoofing](home-spoofing): old feature to provide a portable HOME directory
 
-### Scripts
+### Scripts (`bin/`)
 
-These are not documented extensively, so I recommend that you read them before running. Nevertheless, they don't make changes to your system, except for 'install-*' and 'bashrc-zone' probably...
+These are not documented extensively, so I recommend that you read them before running. Some may do changes to your system (e.g., installing packages).
 
-They are mostly GNU/Linux-centric but some may work on other systems. They are available on PATH after installing the dotfiles.
+They are mostly GNU/Linux-centric but some may work on other systems (good compatibility with macOS). They are available on PATH after installing the dotfiles.
 
-The list is not exhaustive (see [bin](bin)).
+> Some of these scripts are quite old and may not work as expected, I'm working to update them as needed. Focusing on Linux, Termux and macOS support when possible. --goncalomb
+
+Tags:
+
+* stable: in active use and tested
+* caution: use with caution, may do changes to your system, or has some complex behavior
+* bespoke: made for a specific use case, may not be useful to others
+* unknown: unknown status, not tested recently, may be broken, use with caution
 
 Scripts | Description | Tags | Updated
 ------- | ----------- | ---- | -------
@@ -142,5 +149,7 @@ Scripts | Description | Tags | Updated
 [phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install). | unknown | 2018
 [recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`. | bespoke, unknown | 2019
 [sftp-upload](bin/sftp-upload) | A hacked together SFTP uploader script (probably not worth using). | unknown | 2017
+
+# License
 
 dotfiles is released under the terms of the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
