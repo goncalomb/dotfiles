@@ -64,8 +64,11 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/
 
 ## Contents
 
-* [**?**]: experimental features, with limited usefulness
-* [**X**]: old/deprecated features, not tested recently, disabled by default
+* stable: in active use and tested
+* bespoke: made for a specific use case, may not be useful to others
+* [**!**] caution: use with caution, may do changes to your system, or has some complex behavior
+* [**?**] unknown: unknown status, not tested recently, may be broken, experimental
+* [**X**] disabled: old/deprecated, not tested recently, disabled by default
 
 ### Install Scripts and Utils
 
@@ -109,46 +112,39 @@ They are mostly GNU/Linux-centric but some may work on other systems (good compa
 
 > Some of these scripts are quite old and may not work as expected, I'm working to update them as needed. Focusing on Linux, Termux and macOS support when possible. --goncalomb
 
-Tags:
-
-* stable: in active use and tested
-* caution: use with caution, may do changes to your system, or has some complex behavior
-* bespoke: made for a specific use case, may not be useful to others
-* unknown: unknown status, not tested recently, may be broken, use with caution
-
 Scripts | Description | Tags | Updated
 ------- | ----------- | ---- | -------
-[a-clear](bin/a-clear) | Clear Ansible cache (roles and collections). | stable, caution | 2025
+[a-clear](bin/a-clear) | [**!**] Clear Ansible cache (roles and collections). | stable, caution | 2025
 [a-playbook](bin/a-playbook) | Run Ansible playbooks (`playbook.yaml` + `playbook-*.yaml`) with `inventory.yaml`, also installs `requirements.yaml`. | stable | 2025
-[android-bak](bin/android-bak) | Connect to Android (I use Termux and sshd) and backup some files. | bespoke, caution | 2022
+[android-bak](bin/android-bak) | [**!**] Connect to Android (I use Termux and sshd) and backup some files. | bespoke, caution | 2022
 [android-ssh](bin/android-ssh) | Connect to Android (using bcast-ip). | bespoke | 2018
-[bak-disk](bin/bak-disk) | Dump disk metadata and contents. | bespoke, caution | 2021
+[bak-disk](bin/bak-disk) | [**!**] Dump disk metadata and contents. | bespoke, caution | 2021
 [bashrc-zone](bin/bashrc-zone) | Manage bashrc zones. | stable | 2021
 [bcast-ip](bin/bcast-ip) | A simple IPv4 broadcaster. | bespoke | 2018
-[browser-incognito](bin/browser-incognito) | Open an independent browser window in incognito mode (Google Chrome). | unknown | 2018
-[browser-socks](bin/browser-socks) | Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy. | unknown | 2018
-[composer](bin/composer) | Run PHP composer (with auto-install). | unknown | 2017
-[cryptimg](bin/cryptimg) | Create/Manage/Mount LUKS encrypted images, for storing files securely. | bespoke, caution | 2022
+[browser-incognito](bin/browser-incognito) | [**?**] Open an independent browser window in incognito mode (Google Chrome). | unknown | 2018
+[browser-socks](bin/browser-socks) | [**?**] Create a SOCKS proxy with a remote server and start an incognito Google Chrome instance on that proxy. | unknown | 2018
+[composer](bin/composer) | [**?**] Run PHP composer (with auto-install). | unknown | 2017
+[cryptimg](bin/cryptimg) | [**!**] Create/Manage/Mount LUKS encrypted images, for storing files securely. | bespoke, caution | 2022
 [dl-single](bin/dl-single) | Downloads a single file from a URL (with metadata). | bespoke | 2022
-[drive-serial](bin/drive-serial) | Find the serial number of the physical drive. | unknown | 2017
-[estore](bin/estore) | Encrypted data storage (to store passwords and other data). | unknown | 2022
-[gh-clone](bin/gh-clone) | Clone from GitHub with `gh-clone user/repo`. | unknown | 2017
-[gh-set-user](bin/gh-set-user) | Sets your git name and email based on your GitHub profile. | unknown | 2018
+[drive-serial](bin/drive-serial) | [**?**] Find the serial number of the physical drive. | unknown | 2017
+[estore](bin/estore) | [**?**] Encrypted data storage (to store passwords and other data). | unknown | 2022
+[gh-clone](bin/gh-clone) | [**?**] Clone from GitHub with `gh-clone user/repo`. | unknown | 2017
+[gh-set-user](bin/gh-set-user) | [**?**] Sets your git name and email based on your GitHub profile. | unknown | 2018
 [git-ai](bin/git-ai) | Git wrapper that adds AI suffix to the author name and email. Usage: `git ai commit ...`. | stable | 2026
-[git-mtime](bin/git-mtime) | Set the modified date of the files on a git repository to the last commit date that changed the files. | unknown | 2017
+[git-mtime](bin/git-mtime) | [**?**] Set the modified date of the files on a git repository to the last commit date that changed the files. | unknown | 2017
 [git-sync](bin/git-sync) | Sync all branches and tags on all remotes (fetch + ff-only merge + push). | stable | 2026
-[install-applications](bin/install-applications) | A utility to install some applications. | bespoke, unknown, caution | 2018
-[install-extra-packages](bin/install-extra-packages) | Installs extra packages using apt-get from external repositories. | bespoke, unknown, caution | 2023
-[install-packages](bin/install-packages) | A utility to install some basic packages. | bespoke, unknown, caution | 2018
-[irc](bin/irc) | Manages Weechat (IRC client) sessions using screen. | unknown | 2021
+[install-applications](bin/install-applications) | [**!**][**?**] A utility to install some applications. | bespoke, unknown, caution | 2018
+[install-extra-packages](bin/install-extra-packages) | [**!**][**?**] Installs extra packages using apt-get from external repositories. | bespoke, unknown, caution | 2023
+[install-packages](bin/install-packages) | [**!**][**?**] A utility to install some basic packages. | bespoke, unknown, caution | 2018
+[irc](bin/irc) | [**?**] Manages Weechat (IRC client) sessions using screen. | unknown | 2021
 [logdata](bin/logdata) | A script to log events and notes throughout the day. | bespoke | 2021
 [lspath](bin/lspath) | Lists the directories in PATH. | stable | 2026
-[mailop](bin/mailop) | Organize emails on imap mailboxes. | unknown | 2018
-[mywg](bin/mywg) | Configures WireGuard from a well-known configuration file. | unknown | 2023
+[mailop](bin/mailop) | [**?**] Organize emails on imap mailboxes. | unknown | 2018
+[mywg](bin/mywg) | [**?**] Configures WireGuard from a well-known configuration file. | unknown | 2023
 [new-script](bin/new-script) | Creates a new bash script (using a template). | stable | 2025
-[phpdoc](bin/phpdoc) | Run phpDocumentor (with auto-install). | unknown | 2018
-[recipes](bin/recipes) | Run container recipes (see `./container-recipes`), try `recipes rs-osrs`. | bespoke, unknown | 2019
-[sftp-upload](bin/sftp-upload) | A hacked together SFTP uploader script (probably not worth using). | unknown | 2017
+[phpdoc](bin/phpdoc) | [**?**] Run phpDocumentor (with auto-install). | unknown | 2018
+[recipes](bin/recipes) | [**?**] Run container recipes (see `./container-recipes`), try `recipes rs-osrs`. | bespoke, unknown | 2019
+[sftp-upload](bin/sftp-upload) | [**?**] A hacked together SFTP uploader script (probably not worth using). | unknown | 2017
 
 ## License
 

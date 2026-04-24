@@ -55,7 +55,12 @@ def make_scripts_table(directory: str):
             description = metadata.get('description', '-')
             tags = ', '.join(metadata.get('tags', [])) or '-'
             year = metadata.get('year', '')[-4:] or '-'
-            table.append(f'{link} | {description} | {tags} | {year}\n')
+            flags = []
+            if 'caution' in tags:
+                flags.append('[**!**]')
+            if 'unknown' in tags:
+                flags.append('[**?**]')
+            table.append(f'{link} | {''.join(flags) + ' ' if flags else ''}{description} | {tags} | {year}\n')
         else:
             print(f"Warning: No metadata found for '{path}'.")
             table.append(f'{link} | - | - | -\n')
@@ -80,7 +85,7 @@ if __name__ == '__main__':
     bin_header, bin_table = make_scripts_table('bin')
     with open('README.md', 'r+') as fp:
         lines = fp.readlines()
-        lines = update_lines(lines, '### Scripts\n', bin_header, bin_table)
+        lines = update_lines(lines, '### Scripts (`bin/`)\n', bin_header, bin_table)
         fp.seek(0)
         fp.writelines(lines)
         fp.truncate()
