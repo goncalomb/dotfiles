@@ -1,0 +1,75 @@
+---
+- name: Install custom systemd services
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+
+  vars:
+    services_dir: '{{ playbook_dir }}/services'
+    system_dir: /etc/systemd/system
+    bin_dir: /usr/local/sbin
+
+  tasks:
+    - name: Find service files
+      ansible.builtin.find:
+        paths: '{{ services_dir }}'
+        patterns: '*.service'
+        file_type: file
+        recurse: false
+      register: service_find
+
+    - name: Copy service files to {{ system_dir }}
+      ansible.builtin.template:
+        src: '{{ item.path }}'
+        dest: '{{ system_dir }}/{{ item.path | basename }}'
+        owner: root
+        group: root
+        mode: '0644'
+      loop: '{{ service_find.files }}'
+      loop_control:
+        label: '{{ item.path | basename }}'
+
+    - name: Check binaries
+      ansible.builtin.stat:
+        path: '{{ item.path | regex_replace("\.service$", "") }}'
+      loop: '{{ service_find.files }}'
+      loop_control:
+        label: '{{ item.path | basename }}'
+      register: binary_stats
+
+    - name: Copy binaries to {{ bin_dir }}
+      ansible.builtin.copy:
+        src: '{{ item.stat.path }}'
+        dest: '{{ bin_dir }}/{{ item.stat.path | basename }}'
+        owner: root
+        group: root
+        mode: '0755'
+      when: item.stat.exists and item.stat.isreg
+      loop: '{{ binary_stats.results }}'
+      loop_control:
+        label: '{{ item.item.path | basename }}'
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Enable and restart services
+      ansible.builtin.systemd:
+        name: '{{ item.path | basename }}'
+        enabled: true
+        state: restarted
+      loop: '{{ service_find.files }}'
+      loop_control:
+        label: '{{ item.path | basename }}'
+
+    - ansible.builtin.pause:
+        seconds: 2
+
+    - ansible.builtin.service_facts:
+
+    - ansible.builtin.debug:
+        msg: '{{ ansible_facts.services[item.path | basename] | default(None) }}'
+      loop: '{{ service_find.files }}'
+      loop_control:
+        label: '{{ item.path | basename }}'

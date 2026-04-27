@@ -82,7 +82,6 @@ These scripts only do local changes that won't affect your system:
 These scripts may do changes to your system:
 
 * [install-home.sh](install-home.sh): automated installation, updates and installs system packages, installs dotfiles (see above)
-* [**?**] [install-systemd.sh](install-systemd.sh): installs systemd services (you probably don't want it)
 * [install-termux.sh](install-termux.sh): helps download and install Termux APKs on Termux
 * [utils/darwin-use-brew-bash.sh](utils/darwin-use-brew-bash.sh): for macOS, installs bash from homebrew to replace the outdated version bundled with xcode, set it as the current user's SHELL
 
@@ -101,7 +100,7 @@ These scripts may do changes to your system:
 ### Other Stuff
 
 * [**?**] [container-recipes](container-recipes): specialized Docker container images, a poof of concept meant to provide a quick way to access some tools and programs without installing them on the host (managed using the [`bin/recipes`](bin/recipes) script)
-* [**?**] [systemd](systemd): a recent attempt at hosting some systemd services (see [install-systemd.sh](install-systemd.sh))
+* [**?**] [systemd](systemd): a recent attempt at hosting some personal systemd services using Ansible (you probably don't want them)
 * [**X**] [home-spoofing](home-spoofing): old feature to provide a portable HOME directory
 
 ### Scripts (`bin/`)

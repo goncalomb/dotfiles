@@ -4,7 +4,7 @@
 Description=Control power modes of external displays
 
 [Service]
-ExecStart=/usr/local/sbin/gmb-display-power
+ExecStart={{ bin_dir }}/gmb-display-power
 
 [Install]
 WantedBy=multi-user.target
