@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # /// dotfiles
-# description = "Run Ansible playbooks (`playbook.yaml` + `playbook-*.yaml`) with `inventory.yaml`, also installs `requirements.yaml`."
+# description = "Run Ansible playbooks (`playbook.yaml` + `playbook-*.yaml`) with optional `inventory.yaml`, after installing `requirements.yaml`."
 # author = "goncalomb"
-# year = "2025"
+# year = "2025-2026"
 # tags = ["stable"]
 # ///
 
@@ -25,12 +25,18 @@ if [ -f requirements.yaml ]; then
     echo "requirements:"
     echo "  requirements.yaml"
 fi
-echo "inventory:"
-echo "  inventory.yaml"
+if [ -f inventory.yaml ]; then
+    echo "inventory:"
+    echo "  inventory.yaml"
+    ARGUMENTS+=("-i" "inventory.yaml")
+fi
 echo "playbooks:"
 for PB in "${PLAYBOOKS[@]}"; do
     echo "  $PB"
 done
 
+export ANSIBLE_INVENTORY_UNPARSED_WARNING=False
+export ANSIBLE_LOCALHOST_WARNING=False
+
 [ -f requirements.yaml ] && ansible-galaxy install -r requirements.yaml
-ansible-playbook -i inventory.yaml "${ARGUMENTS[@]}" -- "${PLAYBOOKS[@]}"
+exec ansible-playbook "${ARGUMENTS[@]}" -- "${PLAYBOOKS[@]}"
