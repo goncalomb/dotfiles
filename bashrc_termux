@@ -1,4 +1,8 @@
-#!/bin/bash
+# /// dotfiles
+# description = "some aliases and functions for Termux"
+# author = "goncalomb"
+# tags = []
+# ///
 
 kill-termux() {
     killall com.termux || {

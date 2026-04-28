@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# /// dotfiles
+# description = "installs a small subset of [my gists](https://gist.github.com/goncalomb)"
+# author = "goncalomb"
+# tags = []
+# ///
 
 set -e
 cd -- "$(dirname -- "$0")"

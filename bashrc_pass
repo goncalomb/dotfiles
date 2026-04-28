@@ -1,4 +1,8 @@
-#!/bin/bash
+# /// dotfiles
+# description = "old attempt at creating a password manager (disabled)"
+# author = "goncalomb"
+# tags = ["disabled"]
+# ///
 
 return # XXX: old code, don't use anything on this file
 

@@ -1,3 +1,9 @@
+# /// dotfiles
+# description = "a small collection of git aliases"
+# author = "goncalomb"
+# tags = []
+# ///
+
 [alias]
 	d = diff
 	dc = diff --cached

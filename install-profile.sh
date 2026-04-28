@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# /// dotfiles
+# description = "installs some extra environment files and PATHs"
+# author = "goncalomb"
+# tags = []
+# ///
 
 set -euo pipefail
 cd -- "$(dirname -- "$0")"

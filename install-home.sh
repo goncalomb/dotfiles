@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "automated installation, updates and installs system packages, installs dotfiles (see above)"
+# author = "goncalomb"
+# tags = ["caution"]
+# ///
+
 set -euo pipefail
 cd -- "$(dirname -- "$0")"
 

@@ -1,4 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# /// dotfiles
+# description = "main install script (see above, changes `~/.bashrc` and `~/.gitconfig`)"
+# author = "goncalomb"
+# tags = []
+# ///
+
+set -e
 
 DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 DIR_PARENT=$(cd -P -- "$(dirname -- "$DIR")" && pwd -P)

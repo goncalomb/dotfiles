@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
+# /// dotfiles
+# description = "install asdf locally"
+# author = "goncalomb"
+# tags = []
+# ///
+
 set -e
 cd -- "$(dirname -- "$0")"
 
 # https://asdf-vm.com/guide/getting-started.html
-
-if command -v brew >/dev/null; then
-    echo "installing asdf using homebrew..."
-    brew install --formula asdf
-    exit 0
-fi
 
 mkdir -p tmp/bin
 cd tmp/bin

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# /// dotfiles
+# description = "for macOS, installs bash from homebrew to replace the outdated version bundled with xcode, set it as the current user's SHELL"
+# author = "goncalomb"
+# tags = ["caution"]
+# ///
+
 set -euo pipefail
 
 [ "$(uname -s)" != "Darwin" ] && echo "error: not macOS (Darwin)" >&2 && exit 1

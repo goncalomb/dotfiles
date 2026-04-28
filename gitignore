@@ -1,1 +1,7 @@
+# /// dotfiles
+# description = "some git ignores"
+# author = "goncalomb"
+# tags = []
+# ///
+
 .DS_Store

@@ -1,3 +1,9 @@
+# /// dotfiles
+# description = "custom PS1 with git branch, PATHs, aliases, functions and other configurations"
+# author = "goncalomb"
+# tags = []
+# ///
+
 DIR=$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 
 export DOTFILES_GONCALOMB=$DIR

@@ -33,37 +33,50 @@ def read_file_pep723(path: str, name: str = 'script'):
         return read_pep723(f.read(), name)
 
 
+def read_file_meta(path: str):
+    meta = read_file_pep723(path, 'dotfiles')
+    if not meta:
+        print(f"Warning: No metadata found for '{path}'.")
+        meta = {}
+    description = meta.get('description', '')
+    tags = meta.get('tags', [])
+    year = meta.get('year', '')
+    flags = []
+    if 'caution' in tags:
+        flags.append('\\[**!**\\]')
+    if 'unknown' in tags:
+        flags.append('\\[**?**\\]')
+    if 'disabled' in tags:
+        flags.append('\\[**X**\\]')
+    return {
+        'description': description,
+        'tags': tags,
+        'year': year,
+        'description_md': f'{''.join(flags) + ' ' if flags else ''}{description or '-'}',
+        'tags_md': ', '.join(tags) or '-',
+        'year_md': year[-4:] or '-',
+    }
+
+
 def read_scripts_directory_pep723(directory: str):
     result = []
     for f in os.listdir(directory):
         path = os.path.join(directory, f)
         if os.path.isfile(path):
-            f_metadata = read_file_pep723(path, 'dotfiles')
-            result.append((path, f, f_metadata))
+            f_meta = read_file_meta(path)
+            result.append((path, f, f_meta))
     result.sort(key=lambda x: x[1])
     return result
 
 
-def make_scripts_table(directory: str):
-    scripts = read_scripts_directory_pep723(directory)
+def make_scripts_table(dirs: str):
+    scripts = (s for d in dirs for s in read_scripts_directory_pep723(d))
     columns = ['Scripts', 'Description', 'Tags', 'Updated']
     header = ' | '.join(columns) + '\n'
     table = [header, ' | '.join('-' * len(col) for col in columns) + '\n']
-    for path, name, metadata in scripts:
+    for path, name, meta in scripts:
         link = f'[{name}]({path})'
-        if metadata:
-            description = metadata.get('description', '-')
-            tags = ', '.join(metadata.get('tags', [])) or '-'
-            year = metadata.get('year', '')[-4:] or '-'
-            flags = []
-            if 'caution' in tags:
-                flags.append('[**!**]')
-            if 'unknown' in tags:
-                flags.append('[**?**]')
-            table.append(f'{link} | {''.join(flags) + ' ' if flags else ''}{description} | {tags} | {year}\n')
-        else:
-            print(f"Warning: No metadata found for '{path}'.")
-            table.append(f'{link} | - | - | -\n')
+        table.append(f'{link} | {meta['description_md']} | {meta['tags_md']} | {meta['year_md']}\n')
     return header, table
 
 
@@ -81,11 +94,26 @@ def update_lines(lines: list, after: str, start: str, content: list, end: str = 
         return lines[:j] + content
 
 
+def update_file_list_lines(lines: list):
+    REGEX = r'^\* \[([^\]]+)\]\(([^)]+)\):'
+    result = list(lines)
+    for i, line in enumerate(lines):
+        match = re.match(REGEX, line)
+        if match and match.group(1) == match.group(2):
+            name = match.group(1)
+            if os.path.isfile(name):
+                link = f'[{name}]({name})'
+                meta = read_file_meta(name)
+                result[i] = f'* {link}: {meta['description_md']}\n'
+    return result
+
+
 if __name__ == '__main__':
-    bin_header, bin_table = make_scripts_table('bin')
+    bin_header, bin_table = make_scripts_table(['bin', 'bin_termux'])
     with open('README.md', 'r+') as fp:
         lines = fp.readlines()
         lines = update_lines(lines, '### Scripts (`bin/`)\n', bin_header, bin_table)
+        lines = update_file_list_lines(lines)
         fp.seek(0)
         fp.writelines(lines)
         fp.truncate()

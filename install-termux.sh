@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# /// dotfiles
+# description = "helps download and install Termux APKs on Termux"
+# author = "goncalomb"
+# tags = ["caution"]
+# ///
 
 set -euo pipefail
 cd -- "$(dirname -- "$0")"
