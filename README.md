@@ -36,31 +36,59 @@ The `install-home.sh` script is a more automated installer that also updates and
 * installs `git` and `python3` on Linux/Termux;
 * installs [Homebrew](https://brew.sh/) on macOS;
 * installs the dotfiles (using `install.sh`);
+* looks for a `install-home.toml` config file for further setup (see below);
 
 It can be run independently, e.g., directly from terminal with `curl`:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/install-home.sh)"
+curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/install-home.sh | bash
 ```
 
-### Personal Note
+A local `install-home.toml` can be used to further customization depending on the system. Example:
 
-My personal install procedure is something like this:
+```toml
+# every config table [configs.<name>] has the same fields (all optional)
+# a config is only selected if the `when` condition matches the current system,
+# or is set to `true`, possible keys for when:
+# - platform: current platform (Linux, Termux or Darwin)
+# - user: current username
+# a config can extend other configs, merging their values
 
-```bash
-# install using install-home.sh
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/goncalomb/dotfiles/HEAD/install-home.sh)"
-# install extras
-~/dotfiles/install-asdf.sh
-~/dotfiles/install-gists.sh
-# install other packages and applications (outside this repo)
-# restart the terminal
-~/dotfiles/install-brew-bash.sh # on macOS
-~/dotfiles/install-termux.sh # on Termux
-# restart the terminal
+[configs.base] # this config is not enabled by default (missing `when`)
+install_asdf = false                     # run `install-asdf.sh` from dotfiles
+install_gists = false                    # run `install-gists.sh` from dotfiles
+apt_packages = ["curl", "wget"]          # apt packages to install
+brew_formulae = ["git", "python3"]       # homebrew formulae to install
+brew_casks = ["visual-studio-code"]      # homebrew casks to install
+pipx_packages = ["magic-wormhole"]       # pipx packages to install
+asdf_plugins = ["nodejs"]                # asdf plugins to add
+vscode_settings = "settings.json"        # file to replace vscode user settings
+vscode_extensions = ["ms-python.python"] # vscode extensions to install
+bashrc_extras = ["bashrc/custom"]        # files to be appended to ~/.bashrc
+exec_extras = ["exec/custom.sh"]         # files to be executed (last step)
+
+[configs.base.git_config] # global git config for base
+"user.name" = "Your Name"
+"user.email" = "email@example.com"
+
+[configs.linux]
+extends = ["base"]            # extends base config (merge)
+when = { platform = "Linux" } # enabled only when platform is Linux
+apt_packages = ["vlc"]        # e.g. add more apt packages
+
+[configs.myuser]
+extends = ["base"]         # extends base config (merge)
+when = { user = "myuser" } # enabled only when the current user is "myuser"
+brew_casks = ["spotify"]   # e.g. add more brew casks
+
+[configs.always]
+when = true
+exec_extras = ["pwd"] # this will always be executed
 ```
 
-> I'm currently improving this procedure, and in the future I will update `install-home.sh` to completely automate system bootstrap/updating (using a declarative configuration). --goncalomb
+> This may look like a convoluted way to setup a system, but this current version of `install-home.sh` is the final combination of various other setup scripts that I had before. At some point in the future I may replace this with Ansible or pyinfra. But this works for me right now.
+>
+> I keep my own `install-home.toml` configuration and some other scripts outside this repo, then I just run `install-home.sh` to keep the system up-to-date.
 
 ## Contents
 
