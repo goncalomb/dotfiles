@@ -60,6 +60,7 @@ install_gists = false                    # run `install-gists.sh` from dotfiles
 apt_packages = ["curl", "wget"]          # apt packages to install
 brew_formulae = ["git", "python3"]       # homebrew formulae to install
 brew_casks = ["visual-studio-code"]      # homebrew casks to install
+flatpak_refs = ["com.bitwarden.desktop"] # flatpak refs to install
 pipx_packages = ["magic-wormhole"]       # pipx packages to install
 asdf_plugins = ["nodejs"]                # asdf plugins to add
 vscode_settings = "settings.json"        # file to replace vscode user settings

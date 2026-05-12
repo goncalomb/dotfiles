@@ -172,6 +172,7 @@ if __name__ == '__main__':
             'apt_packages': [],
             'brew_formulae': [],
             'brew_casks': [],
+            'flatpak_refs': [],
             'pipx_packages': [],
             'git_config': {},
             'asdf_plugins': [],
@@ -227,6 +228,12 @@ fi
 if command -v brew >/dev/null && [ ${#BREW_CASKS[@]} -gt 0 ]; then
     echo70 install brew casks
     brew install --casks "${BREW_CASKS[@]}"
+fi
+
+if command -v flatpak >/dev/null && [ ${#FLATPAK_REFS[@]} -gt 0 ]; then
+    echo70 install flatpak refs
+    flatpak install -y "${FLATPAK_REFS[@]}"
+    flatpak update -y
 fi
 
 if command -v pipx >/dev/null && [ ${#PIPX_PACKAGES[@]} -gt 0 ]; then
