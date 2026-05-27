@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # /// dotfiles
-# description = "Run Ansible playbooks (`playbook.yaml` + `playbook-*.yaml`) with optional `inventory.yaml`, after installing `requirements.yaml`."
+# description = "Run Ansible playbooks (`playbook.ya?ml` + `playbook-*.ya?ml`) with optional `inventory.ya?ml`, after installing `requirements.ya?ml`."
 # author = "goncalomb"
 # year = "2025-2026"
 # tags = ["stable"]
@@ -18,17 +18,19 @@ for ARG in "$@"; do
     [ -z "$DD" ] && ARGUMENTS+=("$ARG") || PLAYBOOKS+=("$ARG")
 done
 
-[ ${#PLAYBOOKS[@]} -eq 0 ] && PLAYBOOKS+=(playbook[.]yaml playbook-*.yaml)
-[ ${#PLAYBOOKS[@]} -eq 0 ] && PLAYBOOKS+=(playbook.yaml)
+[ ${#PLAYBOOKS[@]} -eq 0 ] && PLAYBOOKS+=(playbook[.]y{,a}ml playbook-*.y{,a}ml)
+[ ${#PLAYBOOKS[@]} -eq 0 ] && PLAYBOOKS+=(playbook.yml) # default
 
-if [ -f requirements.yaml ]; then
+REQ=(requirements[.]y{,a}ml)
+if [ ${#REQ[@]} -gt 0 ]; then
     echo "requirements:"
-    echo "  requirements.yaml"
+    echo "  ${REQ[0]}"
 fi
-if [ -f inventory.yaml ]; then
+INV=(inventory[.]y{,a}ml)
+if [ ${#INV[@]} -gt 0 ]; then
     echo "inventory:"
-    echo "  inventory.yaml"
-    ARGUMENTS+=("-i" "inventory.yaml")
+    echo "  ${INV[0]}"
+    ARGUMENTS+=("-i" "${INV[0]}")
 fi
 echo "playbooks:"
 for PB in "${PLAYBOOKS[@]}"; do
@@ -38,5 +40,5 @@ done
 export ANSIBLE_INVENTORY_UNPARSED_WARNING=False
 export ANSIBLE_LOCALHOST_WARNING=False
 
-[ -f requirements.yaml ] && ansible-galaxy install -r requirements.yaml
+[ ${#REQ[@]} -gt 0 ] && ansible-galaxy install -r "${REQ[0]}"
 exec ansible-playbook "${ARGUMENTS[@]}" -- "${PLAYBOOKS[@]}"
