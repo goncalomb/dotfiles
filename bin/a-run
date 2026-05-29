@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# /// dotfiles
+# description = "Run `run_xxx.ya?ml` Ansible playbook, after installing `requirements.ya?ml`."
+# author = "goncalomb"
+# year = "2026"
+# tags = ["stable"]
+# ///
+
+set -euo pipefail
+shopt -s nullglob
+
+if [ "$#" -lt 1 ]; then
+    echo "usage: ${0##*/} <run-name> [ansible-playbook-args...]" >&2
+    exit 1
+fi
+
+RUN=("run_$1"[.]y{,a}ml)
+if [ ${#RUN[@]} -eq 0 ]; then
+    echo "error: 'run_$1' playbook not found" >&2
+    exit 1
+fi
+
+REQ=(requirements[.]y{,a}ml)
+if [ ${#REQ[@]} -gt 0 ]; then
+    ansible-galaxy install -r "${REQ[0]}"
+fi
+
+exec ansible-playbook "${@:2}" -- "${RUN[0]}"

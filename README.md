@@ -147,6 +147,7 @@ Scripts | Description | Tags | Updated
 ------- | ----------- | ---- | -------
 [a-clear](bin/a-clear) | \[**!**\] Clear Ansible cache (roles and collections). | stable, caution | 2025
 [a-playbook](bin/a-playbook) | Run Ansible playbooks (`playbook.ya?ml` + `playbook-*.ya?ml`) with optional `inventory.ya?ml`, after installing `requirements.ya?ml`. | stable | 2026
+[a-run](bin/a-run) | Run `run_xxx.ya?ml` Ansible playbook, after installing `requirements.ya?ml`. | stable | 2026
 [android-bak](bin/android-bak) | \[**!**\] Connect to Android (I use Termux and sshd) and backup some files. | bespoke, caution | 2022
 [android-ssh](bin/android-ssh) | Connect to Android (using bcast-ip). | bespoke | 2018
 [bak-disk](bin/bak-disk) | \[**!**\] Dump disk metadata and contents. | bespoke, caution | 2021
