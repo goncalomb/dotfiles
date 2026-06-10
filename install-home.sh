@@ -170,6 +170,7 @@ if __name__ == '__main__':
             'install_asdf': False,
             'install_gists': False,
             'apt_packages': [],
+            'snap_packages': [],
             'brew_formulae': [],
             'brew_casks': [],
             'flatpak_refs': [],
@@ -218,6 +219,17 @@ fi
 if [ ${#APT_PACKAGES[@]} -gt 0 ] && [ -n "$APT_CMD" ]; then
     echo70 install apt packages
     $APT_CMD install -y "${APT_PACKAGES[@]}"
+fi
+
+if command -v snap >/dev/null && [ ${#SNAP_PACKAGES[@]} -gt 0 ]; then
+    echo70 install snap packages
+    for PKG in "${SNAP_PACKAGES[@]}"; do
+        if [[ "$PKG" =~ /classic$ ]]; then
+            sudo snap install "${PKG:0:-8}" --classic
+        else
+            sudo snap install "$PKG"
+        fi
+    done
 fi
 
 if command -v brew >/dev/null && [ ${#BREW_FORMULAE[@]} -gt 0 ]; then
