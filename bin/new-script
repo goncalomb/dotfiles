@@ -3,7 +3,7 @@
 # /// dotfiles
 # description = "Creates a new bash script (using a template)."
 # author = "goncalomb"
-# year = "2025"
+# year = "2025-2026"
 # tags = ["stable"]
 # ///
 
@@ -23,5 +23,5 @@ cd -- "$(dirname -- "$0")"
 echo "hi!"
 EOF
 
-chmod +x -- "$FILE"
+chmod -- +x "$FILE"
 cat -- "$FILE"

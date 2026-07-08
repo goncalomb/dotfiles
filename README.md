@@ -173,7 +173,7 @@ Scripts | Description | Tags | Updated
 [lspath](bin/lspath) | Lists the directories in PATH. | stable | 2026
 [mailop](bin/mailop) | \[**?**\] Organize emails on imap mailboxes. | unknown | 2018
 [mywg](bin/mywg) | \[**?**\] Configures WireGuard from a well-known configuration file. | unknown | 2023
-[new-script](bin/new-script) | Creates a new bash script (using a template). | stable | 2025
+[new-script](bin/new-script) | Creates a new bash script (using a template). | stable | 2026
 [phpdoc](bin/phpdoc) | \[**?**\] Run phpDocumentor (with auto-install). | unknown | 2018
 [recipes](bin/recipes) | \[**?**\] Run container recipes (see `./container-recipes`), try `recipes rs-osrs`. | bespoke, unknown | 2019
 [sftp-upload](bin/sftp-upload) | \[**?**\] A hacked together SFTP uploader script (probably not worth using). | unknown | 2017
