@@ -168,6 +168,7 @@ if __name__ == '__main__':
     def config_merge(configs):
         merged = {
             'install_asdf': False,
+            'install_mise': False,
             'install_gists': False,
             'apt_packages': [],
             'snap_packages': [],
@@ -209,6 +210,11 @@ EOF
 if [ -n "$INSTALL_ASDF" ]; then
     echo70 install asdf
     "$IH_DOTFILES_DIR/install-asdf.sh"
+fi
+
+if [ -n "$INSTALL_MISE" ]; then
+    echo70 install mise
+    "$IH_DOTFILES_DIR/install-mise.sh"
 fi
 
 if [ -n "$INSTALL_GISTS" ]; then

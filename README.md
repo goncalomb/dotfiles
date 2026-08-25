@@ -56,6 +56,7 @@ A local `install-home.toml` can be used to further customization depending on th
 
 [configs.base] # this config is not enabled by default (missing `when`)
 install_asdf = false                     # run `install-asdf.sh` from dotfiles
+install_mise = false                     # run `install-mise.sh` from dotfiles
 install_gists = false                    # run `install-gists.sh` from dotfiles
 apt_packages = ["curl", "wget"]          # apt packages to install
 brew_formulae = ["git", "python3"]       # homebrew formulae to install
@@ -109,6 +110,7 @@ Main scripts that install the dotfiles:
 Extra scripts that install to a `tmp/` directory inside the dotfiles:
 
 * [install-asdf.sh](install-asdf.sh): install asdf locally
+* [install-mise.sh](install-mise.sh): install mise locally
 * [install-gists.sh](install-gists.sh): installs a small subset of [my gists](https://gist.github.com/goncalomb)
 * [install-profile.sh](install-profile.sh): installs some extra environment files and PATHs
 
