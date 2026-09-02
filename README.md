@@ -171,7 +171,7 @@ Scripts | Description | Tags | Updated
 [install-extra-packages](bin/install-extra-packages) | \[**!**\]\[**?**\] Installs extra packages using apt-get from external repositories. | bespoke, unknown, caution | 2023
 [install-packages](bin/install-packages) | \[**!**\]\[**?**\] A utility to install some basic packages. | bespoke, unknown, caution | 2018
 [irc](bin/irc) | \[**?**\] Manages Weechat (IRC client) sessions using screen. | unknown | 2021
-[logdata](bin/logdata) | A script to log events and notes throughout the day. | bespoke | 2021
+[logdata](bin/logdata) | A script to log events and notes throughout the day. | bespoke | 2026
 [lspath](bin/lspath) | Lists the directories in PATH. | stable | 2026
 [mailop](bin/mailop) | \[**?**\] Organize emails on imap mailboxes. | unknown | 2018
 [mywg](bin/mywg) | \[**?**\] Configures WireGuard from a well-known configuration file. | unknown | 2023

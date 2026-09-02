@@ -3,7 +3,7 @@
 # /// dotfiles
 # description = "A script to log events and notes throughout the day."
 # author = "goncalomb"
-# year = "2017-2019, 2021"
+# year = "2017-2019, 2021, 2026"
 # tags = ["bespoke"]
 # ///
 
@@ -123,7 +123,7 @@ def start_location_track(name):
     print("start (" + name + ")")
 
     head = json.dumps({
-        "version": 1,
+        "version": 2,
         "type": "termux-gps",
         "time": t_start,
         "interval": 5
@@ -137,17 +137,31 @@ def start_location_track(name):
                 print("next")
 
                 t_before = time.time_ns()
-                out = subprocess.check_output(["termux-location", "-p", "gps", "-r", "once"])
-                t_after = time.time_ns()
-                print(str((t_after - t_before)/1e9))
+                t_after = -1
+                try:
+                    out = subprocess.check_output(["termux-location", "-p", "gps", "-r", "once"])
+                    t_after = time.time_ns()
+                    print(str((t_after - t_before)/1e9))
 
-                result = {
-                    "t_before": t_before,
-                    "t_after": t_after,
-                    "data": json.loads(out)
-                }
-                print("lat: " + str(result["data"]["latitude"]) + ", log: " + str(result["data"]["longitude"]) + ", alt: " + str(result["data"]["altitude"]))
-                print("acc: " + str(result["data"]["accuracy"]))
+                    result = {
+                        "t_before": t_before,
+                        "t_after": t_after,
+                        "data": json.loads(out)
+                    }
+                    print("lat: " + str(result["data"]["latitude"]) + ", log: " + str(result["data"]["longitude"]) + ", alt: " + str(result["data"]["altitude"]))
+                    print("acc: " + str(result["data"]["accuracy"]))
+
+                except KeyboardInterrupt:
+                    raise
+
+                except Exception as e:
+                    result = {
+                        "t_before": t_before,
+                        "t_after": t_after,
+                        "error": e.__class__.__name__,
+                    }
+                    print("error: " + result["error"])
+
                 fp.write(json.dumps(result) + "\n")
                 fp.flush()
 
